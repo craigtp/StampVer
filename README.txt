@@ -51,3 +51,9 @@ https://msdn.microsoft.com/en-us/library/dd383571(v=vs.110).aspx#Anchor_2
 
 This help text is always able to be displayed by passing --help to the program.
 
+Examples:
+stamperver -i MINOR --verbose
+would update AssemblyInfo.cs files with versions of 1.1.3 to 1.2.0 with full
+output to the console of all changes made.
+
+

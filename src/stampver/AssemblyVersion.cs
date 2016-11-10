@@ -62,6 +62,16 @@ namespace stampver
             if (_majorInt != null && _majorInt < UInt16.MaxValue)
             {
                 _majorInt++;
+
+                // Reset the minor and patch numbers to zero when major is incremented.
+                if (_minorInt != null)
+                {
+                    _minorInt = 0;
+                }
+                if (_patchInt != null)
+                {
+                    _patchInt = 0;
+                }
             }
         }
 
@@ -78,6 +88,12 @@ namespace stampver
             if (_minorInt != null && _minorInt < UInt16.MaxValue)
             {
                 _minorInt++;
+
+                // Reset patch number to zero when minor is incremented.
+                if (_patchInt != null)
+                {
+                    _patchInt = 0;
+                }
             }
         }
 
