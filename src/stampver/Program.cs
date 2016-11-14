@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using NDesk.Options;
 
@@ -136,6 +137,8 @@ namespace stampver
 
         private static void DisplayHelpText()
         {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
             var helpText = @"
 stampver by Craig Phillips <craig@craigtp.co.uk>
 ================================================
@@ -189,7 +192,8 @@ method. See here for details:
 https://msdn.microsoft.com/en-us/library/dd383571(v=vs.110).aspx#Anchor_2
 
 This help text is always able to be displayed by passing --help to the program.
-";
+
+This is version: " + versionString;
             Console.WriteLine(helpText);
         }
     }
