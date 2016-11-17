@@ -190,6 +190,11 @@ specifying the --dryrun parameter automatically enables verbose output.
 Any valid file pattern that can be passed to the .NET Directory.EnumerateFiles
 method. See here for details:
 https://msdn.microsoft.com/en-us/library/dd383571(v=vs.110).aspx#Anchor_2
+Specifying a filepattern will search for files matching the file pattern
+(rather than AssemblyInfo.cs) in order to try to make version changes.
+Note that the way the utility matches within the file is exactly the same,
+so file must still have a string matching [assembly: AssemblyVersion(""x.y.z"")]
+within the file before version number changes will be made.
 
 This help text is always able to be displayed by passing --help to the program.
 
