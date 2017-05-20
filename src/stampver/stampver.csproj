@@ -59,10 +59,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyVersion.cs" />
+    <Compile Include="IOWrapper.cs" />
+    <Compile Include="IIOWrapper.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="ProcessedLineResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stampver.cs" />
     <Compile Include="VersionArgs.cs" />
   </ItemGroup>
   <ItemGroup>

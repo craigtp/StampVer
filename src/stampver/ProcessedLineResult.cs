@@ -1,6 +1,6 @@
 ﻿namespace stampver
 {
-    class ProcessedLineResult
+    internal class ProcessedLineResult
     {
         public ProcessedLineResult(string line, bool lineWasModified, string newVersionNumber)
         {
