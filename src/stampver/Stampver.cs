@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NDesk.Options;
@@ -43,9 +42,9 @@ namespace stampver
             }
             catch (OptionException e)
             {
-                Console.Write("error: ");
-                Console.WriteLine(e.Message);
-                Console.WriteLine("Try 'stampver --help' for more information.");
+                _ioWrapper.WriteToStdOut("error: ");
+                _ioWrapper.WriteToStdOut(e.Message);
+                _ioWrapper.WriteToStdOut("Try 'stampver --help' for more information.");
                 return;
             }
 
@@ -91,11 +90,11 @@ namespace stampver
             {
                 // We're neither in quiet mode nor verbose mode,
                 //so simply return the most recent new version number.
-                Console.WriteLine(newVersionNumber);
+                _ioWrapper.WriteToStdOut(newVersionNumber);
             }
         }
 
-        private static ProcessedLineResult ProcessFileLine(string fileLine, VersionArgs versionArgs)
+        private ProcessedLineResult ProcessFileLine(string fileLine, VersionArgs versionArgs)
         {
             var regex = new Regex(@"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)");
 
@@ -132,15 +131,15 @@ namespace stampver
             return new ProcessedLineResult(newFileLine, true, replacedVersionNumber);
         }
 
-        private static void LogIfVerbose(string output, VersionArgs versionArgs)
+        private void LogIfVerbose(string output, VersionArgs versionArgs)
         {
             if (versionArgs.OutputType == OutputType.Verbose)
             {
-                Console.WriteLine(output);
+                _ioWrapper.WriteToStdOut(output);
             }
         }
 
-        private static void DisplayHelpText()
+        private void DisplayHelpText()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
@@ -204,7 +203,7 @@ within the file before version number changes will be made.
 This help text is always able to be displayed by passing --help to the program.
 
 This is version: " + versionString;
-            Console.WriteLine(helpText);
+            _ioWrapper.WriteToStdOut(helpText);
         }
     }
 }
