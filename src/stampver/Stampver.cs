@@ -90,15 +90,27 @@ namespace stampver
             }
             if (versionArgs.OutputType == OutputType.NotSet)
             {
-                // We're neither in quiet mode nor verbose mode,
-                //so simply return the most recent new version number.
-
-                var results = updatedVersionNumbers.GroupBy(v => v).Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
-                    .GroupBy(v => v.VersionNumber).Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
+                // We're neither in quiet mode nor verbose mode, so output all new
+                // version numbers generated along with the occurence count and file count.
+                // i.e.
+                // v0.3.0 (2 occurences in 1 file)
+                // v1.0.1 (4 occurences in 2 files)
+                // v1.1.0 (1 occurence in 1 file)
+                var results = updatedVersionNumbers.GroupBy(v => v)
+                    .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
+                    .GroupBy(v => v.VersionNumber)
+                    .Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
 
                 foreach (var result in results)
                 {
-                    _ioWrapper.WriteToStdOut($"{result.VersionNumber} ({result.OccurenceCount} {(result.OccurenceCount>1?"occurences":"occurence")} in {result.FileCount} {(result.FileCount > 1 ? "files" : "file")})");
+                    // We could use string interpolation here but it looks messy.  string.Format is much more readable.
+                    // ReSharper disable once UseStringInterpolation
+                    _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
+                            result.VersionNumber,
+                            result.OccurenceCount, 
+                            result.OccurenceCount > 1 ? "occurences" : "occurence",
+                            result.FileCount,
+                            result.FileCount > 1 ? "files" : "file"));
                 }
             }
         }
