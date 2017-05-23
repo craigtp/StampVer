@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 // ReSharper disable InconsistentNaming
 
 namespace stampver.Tests
@@ -118,16 +115,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.StdOutputLines, "1.0.1.0"));
+            Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurences in 1 file)"));
             Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]"));
-
-            // TODO:  Looks as though the Console output doesn't output all version numbers that have changed.  i.e. If it updates
-            // two files and each file has two different version numbers, it'll update the versions correctly (eg. 1.0.0 updates to
-            // 1.0.1 and 1.3.0 updates to 1.3.1) however, it only outputs the last updated version number to the console (eg. 1.3.1).
-            // Need to improve the functionality of Stampver to potentially show all vesion number that have been updated but then
-            // might need to display filenames too?
-
-            //Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.StdOutputLines, "1.3.1"));
+            Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurences in 2 files)"));
             Assert.True(TestHelpers.ListContainsSubstring(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]"));
         }
     }

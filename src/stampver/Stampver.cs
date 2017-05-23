@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NDesk.Options;
@@ -60,7 +62,7 @@ namespace stampver
                 fileToSearch = versionArgs.FilePattern;
             }
 
-            var newVersionNumber = string.Empty;
+            var updatedVersionNumbers = new List<Tuple<string, string>>();
             foreach (var file in _ioWrapper.EnumerateFiles(fileToSearch))
             {
                 LogIfVerbose($"Processing file: {file}", versionArgs);
@@ -74,7 +76,7 @@ namespace stampver
                     if (result.LineWasModified)
                     {
                         fileHasBeenModified = true;
-                        newVersionNumber = result.NewVersionNumber;
+                        updatedVersionNumbers.Add(new Tuple<string, string>(result.NewVersionNumber, file));
                     }
                     fileLines[i] = result.Line;
                 }
@@ -90,7 +92,14 @@ namespace stampver
             {
                 // We're neither in quiet mode nor verbose mode,
                 //so simply return the most recent new version number.
-                _ioWrapper.WriteToStdOut(newVersionNumber);
+
+                var results = updatedVersionNumbers.GroupBy(v => v).Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
+                    .GroupBy(v => v.VersionNumber).Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
+
+                foreach (var result in results)
+                {
+                    _ioWrapper.WriteToStdOut($"{result.VersionNumber} ({result.OccurenceCount} {(result.OccurenceCount>1?"occurences":"occurence")} in {result.FileCount} {(result.FileCount > 1 ? "files" : "file")})");
+                }
             }
         }
 
