@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("stampver")]
 [assembly: AssemblyDescription("A small utility to help maintain version numbers for .NET projects")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Craig Phillips")]
 [assembly: AssemblyProduct("stampver")]
-[assembly: AssemblyCopyright("Copyright © 2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © 2017")]
+[assembly: AssemblyTrademark("Craig Phillips")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

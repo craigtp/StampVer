@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 
 namespace stampver.Tests
 {
@@ -10,6 +11,11 @@ namespace stampver.Tests
         public static bool ListContainsSubstring(IEnumerable<string> list, string stringSearched)
         {
             return list.Any(str => str.IndexOf(stringSearched, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        public static void AssertContains(IEnumerable<string> stringList, string stringToFind)
+        {
+            Assert.True(ListContainsSubstring(stringList, stringToFind), $"Expected to find: {stringToFind} but was not found in list.");
         }
     }
 }
