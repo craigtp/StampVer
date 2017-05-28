@@ -7,6 +7,7 @@ namespace stampver.Tests
     [TestFixture]
     public class stampverTests
     {
+        #region Miscellaneous Tests
         [Test]
         public void CallingStampverWithNoArguments_OutputsErrorText()
         {
@@ -19,6 +20,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
@@ -35,6 +37,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "stampver by Craig Phillips <craig@craigtp.co.uk>");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "A small command-line utility");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Usage");
@@ -52,6 +55,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-i'.");
         }
@@ -68,6 +72,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-d'.");
         }
@@ -84,6 +89,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-e'.");
         }
@@ -100,10 +106,11 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
-
+        
         [Test]
         public void CallingStampverWithQuietAndVerboseOptions_OutputsErrorText()
         {
@@ -116,13 +123,13 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Quiet and Verbose options are mutually exclusive!");
         }
+        #endregion
 
-        // ==========================================================================================================================
-        // Increment version number tests
-        // ==========================================================================================================================
+        #region Increment version number tests
         [Test]
         public void CallingStampverWithIncrementPatchCommand_IncrementsAndOutputsNewVersion()
         {
@@ -207,13 +214,13 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
+        #endregion
 
-        // ==========================================================================================================================
-        // Decrement version number tests
-        // ==========================================================================================================================
+        #region Decrement version number tests
         [Test]
         public void CallingStampverWithDecrementPatchCommand_IncrementsAndOutputsNewVersion()
         {
@@ -298,13 +305,13 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
+        #endregion
 
-        // ==========================================================================================================================
-        // Explicit version number tests
-        // ==========================================================================================================================
+        #region Explicit version number tests
         [Test]
         public void CallingStampverWithExplicitVersionCommandAndValidVersionNumber_SetVersionNumberAndOutputsNewVersion()
         {
@@ -333,9 +340,480 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
+        #endregion
 
+        #region Increment version number tests with quiet
+        [Test]
+        public void CallingStampverWithIncrementPatchCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementBuildCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMinorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMajorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementButIncorrectVersionNumberPartCommandWithQuiet_OutputsErrorText()
+        {
+            // Even when using the quiet parameter, error conditions will output to standard out.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Decrement version number tests with quiet
+        [Test]
+        public void CallingStampverWithDecrementPatchCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementBuildCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMinorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMajorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementButIncorrectVersionNumberPartCommandWithQuiet_OutputsErrorText()
+        {
+            // Even when using the quiet parameter, error conditions will output to standard out.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Explicit version number tests with quiet
+        [Test]
+        public void CallingStampverWithExplicitVersionCommandAndValidVersionNumberWithQuiet_SetVersionNumberAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithExplicitCommandButInvalidVersionNumberWithQuiet_OutputsErrorText()
+        {
+            // Even when using the quiet parameter, error conditions will output to standard out.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--quiet" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+        }
+        #endregion
+
+        #region Increment version number tests with verbose
+        [Test]
+        public void CallingStampverWithIncrementPatchCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementBuildCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMinorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMajorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementButIncorrectVersionNumberPartCommandWithVerbose_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Decrement version number tests with verbose
+        [Test]
+        public void CallingStampverWithDecrementPatchCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementBuildCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMinorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMajorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementButIncorrectVersionNumberPartCommandWithVerbose_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Explicit version number tests with verbose
+        [Test]
+        public void CallingStampverWithExplicitVersionCommandAndValidVersionNumberWithVerbose_SetVersionNumberAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithExplicitCommandButInvalidVersionNumberWithVerbose_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+        }
+        #endregion
     }
 }
