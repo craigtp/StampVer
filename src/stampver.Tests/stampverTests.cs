@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 // ReSharper disable InconsistentNaming
 
 namespace stampver.Tests
@@ -803,7 +802,262 @@ namespace stampver.Tests
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
-            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER" });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--verbose" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+        }
+        #endregion
+
+        #region Increment version number tests with dryrun
+        [Test]
+        public void CallingStampverWithIncrementPatchCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementBuildCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMinorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementMajorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithIncrementButIncorrectVersionNumberPartCommandWithDryrun_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Decrement version number tests with dryrun
+        [Test]
+        public void CallingStampverWithDecrementPatchCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementBuildCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMinorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementMajorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementButIncorrectVersionNumberPartCommandWithDryrun_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+        }
+        #endregion
+
+        #region Explicit version number tests with dryrun
+        [Test]
+        public void CallingStampverWithExplicitVersionCommandAndValidVersionNumberWithDryrun_SetVersionNumberAndOutputsNewVersion()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--dryrun" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change: [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithExplicitCommandButInvalidVersionNumberWithDryrun_OutputsErrorText()
+        {
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--dryrun" });
 
             // Act
             sut.Run();
