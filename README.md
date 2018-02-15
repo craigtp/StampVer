@@ -1,15 +1,24 @@
-stampver by Craig Phillips <craig@craigtp.co.uk>
-================================================
+# StampVer
 
-A small command-line utility that will iterate through all of the
-AssemblyInfo.cs files (or other specified files) below the current folder and
-update the AssemblyVersion and AssemblyFileVersion attributes with a version
-compliant with Semantic Versioning (See: http://semver.org/).
+A small command-line utility that will iterate through all of the AssemblyInfo.cs files (or other specified files) below the current folder and update the AssemblyVersion and AssemblyFileVersion attributes with a version compliant with Semantic Versioning (See: http://semver.org/).
+
 The utility can automatically increment or decrement specific parts of the
 version number or can explicitly set the entire version string.
 
-Usage
------
+## Author
+
+StampVer was written by Craig Phillips.
+
+## Source Code
+
+The program is written in C# using Visual Studio 2017.  The solution consists of two projects, one for the StampVer utility itself which has no external dependencies, and one for the Unit Test project, which uses the NUnit 3 NuGet package for it's test framework.
+
+You can build the solution with the built-in build functionality of Visual Studio.  Other than the NUnit3 NuGet package, the solution has no external dependencies.
+
+This project makes use of the [NDesk Options](http://www.ndesk.org/Options) class for parsing command line arguments.
+
+## Usage
+
 stampver.exe [command] [version part or specific version number]
              [(optional) filepattern]
 
