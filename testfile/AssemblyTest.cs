@@ -52,4 +52,3 @@
 [assembly: AssemblyInformationalVersion("REV")]
 
 
-RIZZLEKICKS!
