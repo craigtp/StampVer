@@ -26,10 +26,10 @@ namespace stampver
             {
                 {"i=", "command to increment the version number", v => versionArgs.SetIncrement(v) },
                 {"d=", "command to decrement the version number", v => versionArgs.SetDecrement(v) },
-                {"e=", "command to explicly set the complete version number", v => versionArgs.SetExplicit(v) },
+                {"e=", "command to explicitly set the complete version number", v => versionArgs.SetExplicit(v) },
                 {"quiet", "do not output anything to the console", v => versionArgs.SetQuiet() },
                 {"verbose", "output verbose information to the console", v => versionArgs.SetVerbose() },
-                {"dryrun", "perform a dryrun and don't update any files", v => versionArgs.SetDryrun() },
+                {"dryrun", "perform a dry run and don't update any files", v => versionArgs.SetDryrun() },
                 {"help", "command to increment the version number", v => versionArgs.SetDisplayHelp() }
             };
 
@@ -93,8 +93,8 @@ namespace stampver
                 // We're neither in quiet mode nor verbose mode, so output all new
                 // version numbers generated along with the occurence count and file count.
                 // i.e.
-                // v0.3.0 (2 occurences in 1 file)
-                // v1.0.1 (4 occurences in 2 files)
+                // v0.3.0 (2 occurrences in 1 file)
+                // v1.0.1 (4 occurrences in 2 files)
                 // v1.1.0 (1 occurence in 1 file)
                 var results = updatedVersionNumbers.GroupBy(v => v)
                     .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
@@ -108,7 +108,7 @@ namespace stampver
                     _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
                             result.VersionNumber,
                             result.OccurenceCount, 
-                            result.OccurenceCount > 1 ? "occurences" : "occurence",
+                            result.OccurenceCount > 1 ? "occurrences" : "occurence",
                             result.FileCount,
                             result.FileCount > 1 ? "files" : "file"));
                 }
@@ -199,7 +199,7 @@ x.y.z        = A specific version number where x, y  and z are integer numbers
 
 Note that the specific version number parameter value (x.y.z) is only usable
 with the -e command, and the MAJOR, MINOR and PATCH/BUILD parameter values are
-only usable with the -i or -d commands.  Attemping to use commands and version
+only usable with the -i or -d commands.  Attempting to use commands and version
 parameters that are incompatible will cause the program to display an error.
 
 Additional commands that can be specified are as follows:

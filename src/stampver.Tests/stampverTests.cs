@@ -141,9 +141,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
@@ -159,9 +159,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
@@ -177,9 +177,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
         }
 
@@ -195,9 +195,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
         }
 
@@ -232,9 +232,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
@@ -250,9 +250,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
@@ -268,9 +268,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
         }
 
@@ -286,9 +286,9 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurences in 1 file)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.3.0 (4 occurences in 2 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.3.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
         }
 
@@ -323,7 +323,7 @@ namespace stampver.Tests
 
             // Assert
             Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurences in 3 files)");
+            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurrences in 3 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
 
