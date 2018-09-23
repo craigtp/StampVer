@@ -72,7 +72,7 @@ namespace stampver
 
                 for (var i = 0; i < fileLines.Length; i++)
                 {
-                    var result = ProcessFileLine(fileLines[i], versionArgs);
+                    var result = ProcessFileLine(fileLines[i], i+1, versionArgs);
                     if (result.LineWasModified)
                     {
                         fileHasBeenModified = true;
@@ -115,7 +115,7 @@ namespace stampver
             }
         }
 
-        private ProcessedLineResult ProcessFileLine(string fileLine, VersionArgs versionArgs)
+        private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {
             var regex = new Regex(@"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)");
 
@@ -147,8 +147,8 @@ namespace stampver
                 replacedVersionNumber = originalAssemblyVersion.GetVersionString();
             }
             var newFileLine = fileLine.Replace(originalVersionNumber, replacedVersionNumber);
-            var prefix = versionArgs.IsDryrun ? "Would Change:" : "Changed:";
-            LogIfVerbose($"{prefix} {fileLine} to {newFileLine}", versionArgs);
+            var prefix = versionArgs.IsDryrun ? "Would Change" : "Changed";
+            LogIfVerbose($"{prefix} (Line {fileLineNumber}): {fileLine} to {newFileLine}", versionArgs);
             return new ProcessedLineResult(newFileLine, true, replacedVersionNumber);
         }
 
