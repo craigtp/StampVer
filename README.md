@@ -18,16 +18,16 @@ You can build the solution with the built-in build functionality of Visual Studi
 This project makes use of the [NDesk Options](http://www.ndesk.org/Options) class for parsing command line arguments.
 
 ## Usage
-
-stampver.exe [command] [version part or specific version number]
+```
+stampver.exe [command] [version part or specific version number]  
              [(optional) filepattern]
 
 where:
 
 [command] is:
--i           = Increment the specified version number part by 1.
--d           = Decrement the specified version number part by 1.
--e           = Replace the entire version number string with the specified
+-i           = Increment the specified version number part by 1.  
+-d           = Decrement the specified version number part by 1.  
+-e           = Replace the entire version number string with the specified  
                version number
 
 [version part or specific version number] is:
@@ -70,5 +70,4 @@ Examples:
 stamperver -i MINOR --verbose
 would update AssemblyInfo.cs files with versions of 1.1.3 to 1.2.0 with full
 output to the console of all changes made.
-
-
+```
