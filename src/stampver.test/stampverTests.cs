@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 // ReSharper disable InconsistentNaming
 
 namespace stampver.Tests

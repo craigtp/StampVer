@@ -1,4 +1,4 @@
-﻿namespace stampver
+namespace stampver
 {
     internal class ProcessedLineResult
     {
