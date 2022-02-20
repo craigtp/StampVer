@@ -27,10 +27,10 @@ namespace stampver
                 {"i=", "command to increment the version number", v => versionArgs.SetIncrement(v) },
                 {"d=", "command to decrement the version number", v => versionArgs.SetDecrement(v) },
                 {"e=", "command to explicitly set the complete version number", v => versionArgs.SetExplicit(v) },
-                {"quiet", "do not output anything to the console", v => versionArgs.SetQuiet() },
-                {"verbose", "output verbose information to the console", v => versionArgs.SetVerbose() },
-                {"dryrun", "perform a dry run and don't update any files", v => versionArgs.SetDryrun() },
-                {"help", "command to increment the version number", v => versionArgs.SetDisplayHelp() }
+                {"quiet", "do not output anything to the console", _ => versionArgs.SetQuiet() },
+                {"verbose", "output verbose information to the console", _ => versionArgs.SetVerbose() },
+                {"dryrun", "perform a dry run and don't update any files", _ => versionArgs.SetDryrun() },
+                {"help", "command to increment the version number", _ => versionArgs.SetDisplayHelp() }
             };
 
             try
