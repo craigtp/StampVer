@@ -11,11 +11,11 @@ StampVer was written by Craig Phillips.
 
 ## Source Code
 
-The program is written in C# using Visual Studio 2017.  The solution consists of two projects, one for the StampVer utility itself which has no external dependencies, and one for the Unit Test project, which uses the NUnit 3 NuGet package for it's test framework.
+The program is written in C# targeting .NET 6.0.  The solution consists of two projects, one for the StampVer utility itself which has no external dependencies, and one for the Unit Test project, which uses the NUnit 3 NuGet package for its test framework.
 
-You can build the solution with the built-in build functionality of Visual Studio.  Other than the NUnit3 NuGet package, the solution has no external dependencies.
+You can build the solution with the built-in build functionality of Visual Studio / JetBrains Rider or VS Code.  Other than the NUnit3 NuGet package, the solution has no external dependencies.
 
-This project makes use of the [NDesk Options](http://www.ndesk.org/Options) class for parsing command line arguments.
+This project makes use of the [NDesk Options](http://www.ndesk.org/Options) class for parsing command line arguments (with some minor adjustments to make it compatible with .NET 6.0).
 
 ## Usage
 ```
@@ -57,7 +57,7 @@ specifying the --dryrun parameter automatically enables verbose output.
 Any valid file pattern that can be passed to the .NET Directory.EnumerateFiles
 method.
 ```
-See the [Microsoft Docs for Directory.EnumerateFiles](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.enumeratefiles?view=netframework-4.7.2#System_IO_Directory_EnumerateFiles_System_String_System_String_System_IO_SearchOption_) for further information.
+See the [Microsoft Docs for Directory.EnumerateFiles](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.enumeratefiles) for further information.
 
 ```
 Specifying a filepattern will search for files matching the file pattern
