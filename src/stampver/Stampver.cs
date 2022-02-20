@@ -214,7 +214,7 @@ specifying the --dryrun parameter automatically enables verbose output.
 [filepattern] is:
 Any valid file pattern that can be passed to the .NET Directory.EnumerateFiles
 method. See here for details:
-https://msdn.microsoft.com/en-us/library/dd383571(v=vs.110).aspx#Anchor_2
+https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.enumeratefiles
 Specifying a filepattern will search for files matching the file pattern
 (rather than AssemblyInfo.cs) in order to try to make version changes.
 Note that the way the utility matches within the file is exactly the same,
