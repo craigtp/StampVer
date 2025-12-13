@@ -18,8 +18,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
@@ -35,8 +35,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "stampver by Craig Phillips <craig@craigtp.co.uk>");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "A small command-line utility");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Usage");
@@ -53,8 +53,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-i'.");
         }
@@ -70,8 +70,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-d'.");
         }
@@ -87,8 +87,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-e'.");
         }
@@ -104,8 +104,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
@@ -121,8 +121,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Quiet and Verbose options are mutually exclusive!");
         }
@@ -140,7 +140,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
@@ -158,7 +158,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
@@ -176,7 +176,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurrences in 2 files)");
@@ -194,7 +194,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0 (4 occurrences in 2 files)");
@@ -212,9 +212,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
@@ -231,7 +230,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
@@ -249,8 +248,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+           TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
@@ -267,7 +266,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
@@ -285,7 +284,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurrences in 1 file)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.3.0 (4 occurrences in 2 files)");
@@ -303,8 +302,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -322,7 +321,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurrences in 3 files)");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
@@ -338,9 +337,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
@@ -357,7 +355,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
@@ -373,7 +371,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
@@ -389,7 +387,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
         }
@@ -405,7 +403,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
         }
@@ -423,8 +421,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -442,7 +440,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
@@ -458,7 +456,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
@@ -474,7 +472,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
         }
@@ -490,7 +488,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
         }
@@ -508,8 +506,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -527,7 +525,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
 
@@ -544,8 +542,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
@@ -563,7 +561,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -586,7 +584,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -609,7 +607,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -632,7 +630,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -655,8 +653,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -674,7 +672,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -697,7 +696,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -720,7 +719,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -743,7 +742,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -766,8 +765,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -785,7 +784,7 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
             TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -808,8 +807,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
@@ -827,8 +826,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -849,8 +848,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -871,8 +870,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -893,8 +892,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -915,8 +914,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -934,8 +933,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -956,8 +955,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -978,8 +977,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -1000,8 +999,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -1022,8 +1021,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
@@ -1041,8 +1040,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
@@ -1063,8 +1062,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
