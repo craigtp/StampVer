@@ -1,0 +1,30 @@
+name: Build and Test StampVer
+
+on:
+  push:    
+    branches: master
+  pull_request:
+
+jobs:
+  pr_build_and_test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dotnet-version: ["10.x"]
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install dependencies
+        run: dotnet restore ./src/stampver.sln
+
+      - name: Build
+        run: dotnet build ./src/stampver.sln --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test ./src/stampver.sln

@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using static stampver.Tests.TestHelpers;
+
 // ReSharper disable InconsistentNaming
 
 namespace stampver.Tests
@@ -18,10 +20,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
 
         [Test]
@@ -35,11 +37,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "stampver by Craig Phillips <craig@craigtp.co.uk>");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "A small command-line utility");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Usage");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "stampver by Craig Phillips <craig@craigtp.co.uk>");
+            AssertContains(fakeIOWrapper.StdOutputLines, "A small command-line utility");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Usage");
         }
 
         [Test]
@@ -53,10 +55,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-i'.");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-i'.");
         }
 
         [Test]
@@ -70,10 +72,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-d'.");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-d'.");
         }
 
         [Test]
@@ -87,10 +89,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-e'.");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-e'.");
         }
 
         [Test]
@@ -104,10 +106,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
         }
         
         [Test]
@@ -121,10 +123,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Quiet and Verbose options are mutually exclusive!");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Quiet and Verbose options are mutually exclusive!");
         }
         #endregion
 
@@ -140,11 +142,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
         [Test]
@@ -158,11 +160,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.1 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
         [Test]
@@ -176,11 +178,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
         }
 
         [Test]
@@ -194,11 +196,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
         }
 
         [Test]
@@ -212,10 +214,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -231,11 +232,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
         [Test]
@@ -249,11 +250,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+           AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
         [Test]
@@ -267,11 +268,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
         }
 
         [Test]
@@ -285,11 +286,11 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurrences in 1 file)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "0.3.0 (4 occurrences in 2 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "0.3.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
         }
 
         [Test]
@@ -303,10 +304,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -322,9 +323,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurrences in 3 files)");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurrences in 3 files)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
 
         [Test]
@@ -338,10 +339,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
 
@@ -357,9 +357,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
         [Test]
@@ -373,9 +373,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
         }
 
         [Test]
@@ -389,9 +389,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
         }
 
         [Test]
@@ -405,9 +405,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
         }
 
         [Test]
@@ -423,10 +423,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -442,9 +442,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
         [Test]
@@ -458,9 +458,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
         }
 
         [Test]
@@ -474,9 +474,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
         }
 
         [Test]
@@ -490,9 +490,9 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
         }
 
         [Test]
@@ -508,10 +508,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -527,8 +527,8 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
 
         [Test]
@@ -544,10 +544,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
 
@@ -563,16 +563,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
         }
 
         [Test]
@@ -586,16 +586,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
         }
 
         [Test]
@@ -609,16 +609,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
         }
 
         [Test]
@@ -632,16 +632,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
         }
 
         [Test]
@@ -655,10 +655,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -674,16 +674,17 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -697,16 +698,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -720,16 +721,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -743,16 +744,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
         }
 
         [Test]
@@ -766,10 +767,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -785,16 +786,16 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
         }
 
         [Test]
@@ -808,10 +809,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
 
@@ -827,15 +828,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
         }
 
         [Test]
@@ -849,15 +850,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.1\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.1.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.1.0\")]");
         }
 
         [Test]
@@ -871,15 +872,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.4.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.4.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.1.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.1.0.0\")]");
         }
 
         [Test]
@@ -893,15 +894,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"2.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"2.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"2.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"2.0.0.0\")]");
         }
 
         [Test]
@@ -915,10 +916,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -934,15 +935,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -956,15 +957,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -978,15 +979,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -1000,15 +1001,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"0.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"0.3.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"0.0.0.0\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"0.0.0.0\")]");
         }
 
         [Test]
@@ -1022,10 +1023,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -1041,15 +1042,15 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"5.6.7\")]");
         }
 
         [Test]
@@ -1063,10 +1064,10 @@ namespace stampver.Tests
             sut.Run();
 
             // Assert
-            Assert.True(fakeIOWrapper.StdOutputLines.Count > 0);
-            Assert.True(fakeIOWrapper.FileLinesOutput.Count == 0);
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            TestHelpers.AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
     }
