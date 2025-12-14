@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  deploy:
+  pr_build_and_test:
     runs-on: ubuntu-latest
 
     strategy:
