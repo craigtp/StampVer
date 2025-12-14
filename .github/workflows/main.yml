@@ -21,10 +21,10 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Install dependencies
-        run: dotnet restore ./src/StampVer.sln
+        run: dotnet restore ./src/stampver.sln
 
       - name: Build
-        run: dotnet build ./src/StampVer.sln --configuration Release --no-restore
+        run: dotnet build ./src/stampver.sln --configuration Release --no-restore
       
       - name: Test
-        run: dotnet test ./src/StampVer.sln
+        run: dotnet test ./src/stampver.sln
