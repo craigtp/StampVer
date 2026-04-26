@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using static stampver.Tests.TestHelpers;
 
@@ -1068,6 +1069,35 @@ namespace stampver.Tests
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+        }
+        #endregion
+
+        #region Pluralisation tests
+        [Test]
+        public void CallingStampverAgainstSingleAttributeInSingleFile_OutputsSingularPluralisation()
+        {
+            // Regression test for the misspelt "occurence" string and the pluralisation logic.
+            // The default FakeIOWrapper fixture has 2 attributes per file, so the singular
+            // form ("1 occurrence in 1 file") is never exercised by any other test. This
+            // test uses a custom one-file/one-attribute fixture to pin the singular path
+            // and to ensure the misspelt "occurence" never reappears in user-facing output.
+
+            // Arrange
+            const string singleAttributeFile = @"using System.Reflection;
+[assembly: AssemblyVersion(""2.4.6"")]
+";
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "OnlyFile" },
+                fileContents: new Dictionary<string, string> { { "OnlyFile", singleAttributeFile } });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch" });
+
+            // Act
+            sut.Run();
+
+            // Assert
+            AssertContains(fakeIOWrapper.StdOutputLines, "2.4.7 (1 occurrence in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.4.7\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "occurence");
         }
         #endregion
     }

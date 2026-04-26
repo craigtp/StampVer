@@ -134,13 +134,13 @@ namespace stampver
         private void WriteSummary(List<VersionUpdate> updatedVersionNumbers)
         {
             // We're neither in quiet mode nor verbose mode, so output all new
-            // version numbers generated along with the occurence count and file count.
+            // version numbers generated along with the occurrence count and file count.
             // i.e.
             // v0.3.0 (2 occurrences in 1 file)
             // v1.0.1 (4 occurrences in 2 files)
-            // v1.1.0 (1 occurence in 1 file)
+            // v1.1.0 (1 occurrence in 1 file)
             // For each new version, FileCount is the number of distinct files it
-            // landed in, and OccurenceCount is the total number of attribute
+            // landed in, and OccurrenceCount is the total number of attribute
             // matches replaced (a single file can contribute >1 occurrence).
             var results = updatedVersionNumbers
                 .GroupBy(u => u.VersionNumber)
@@ -148,21 +148,19 @@ namespace stampver
                 {
                     VersionNumber = g.Key,
                     FileCount = g.Select(u => u.FileName).Distinct().Count(),
-                    OccurenceCount = g.Count()
+                    OccurrenceCount = g.Count()
                 });
 
             foreach (var result in results)
             {
-                // We could use string interpolation here but it looks messy.  string.Format is much more readable.
-                // ReSharper disable once UseStringInterpolation
-                _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
-                        result.VersionNumber,
-                        result.OccurenceCount,
-                        result.OccurenceCount > 1 ? "occurrences" : "occurence",
-                        result.FileCount,
-                        result.FileCount > 1 ? "files" : "file"));
+                var occurrences = Pluralize(result.OccurrenceCount, "occurrence", "occurrences");
+                var files = Pluralize(result.FileCount, "file", "files");
+                _ioWrapper.WriteToStdOut($"{result.VersionNumber} ({occurrences} in {files})");
             }
         }
+
+        private static string Pluralize(int count, string singular, string plural)
+            => $"{count} {(count == 1 ? singular : plural)}";
 
         private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {

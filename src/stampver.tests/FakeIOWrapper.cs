@@ -10,14 +10,32 @@ namespace stampver.Tests
         public List<string> FileLinesOutput { get; set; }
         public List<string> StdOutputLines { get; set; }
 
+        // When set, these override the default (File1/File2/File3) fixture so
+        // individual tests can exercise edge cases that the default data can't
+        // represent — e.g. exactly one attribute in exactly one file.
+        private readonly IReadOnlyList<string> _customFiles;
+        private readonly IReadOnlyDictionary<string, string> _customFileContents;
+
         public FakeIOWrapper()
         {
             FileLinesOutput = new List<string>();
             StdOutputLines = new List<string>();
         }
 
+        public FakeIOWrapper(IReadOnlyList<string> files, IReadOnlyDictionary<string, string> fileContents)
+        {
+            FileLinesOutput = new List<string>();
+            StdOutputLines = new List<string>();
+            _customFiles = files;
+            _customFileContents = fileContents;
+        }
+
         public IEnumerable<string> EnumerateFiles(string fileToSearch)
         {
+            if (_customFiles != null)
+            {
+                return _customFiles;
+            }
             return new List<string>
             {
                 "File1", "File2", "File3"
@@ -26,6 +44,11 @@ namespace stampver.Tests
 
         public string[] ReadAllLinesFromFile(string file)
         {
+            if (_customFileContents != null && _customFileContents.TryGetValue(file, out var customText))
+            {
+                return customText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            }
+
             string fileText;
             switch(file)
             {
