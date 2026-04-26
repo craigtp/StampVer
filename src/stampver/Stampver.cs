@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -26,6 +25,11 @@ namespace stampver
         }
 
         private const string DefaultFilePattern = "AssemblyInfo.cs";
+
+        // One entry is added per modified line. Multiple entries with the same
+        // (VersionNumber, FileName) pair are expected — e.g. when a file has
+        // both AssemblyVersion and AssemblyFileVersion attributes.
+        private readonly record struct VersionUpdate(string VersionNumber, string FileName);
 
         public void Run()
         {
@@ -91,9 +95,9 @@ namespace stampver
             }
         }
 
-        private List<Tuple<string, string>> ProcessFiles(string pattern, VersionArgs versionArgs)
+        private List<VersionUpdate> ProcessFiles(string pattern, VersionArgs versionArgs)
         {
-            var updatedVersionNumbers = new List<Tuple<string, string>>();
+            var updatedVersionNumbers = new List<VersionUpdate>();
             foreach (var file in _ioWrapper.EnumerateFiles(pattern))
             {
                 ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
@@ -101,7 +105,7 @@ namespace stampver
             return updatedVersionNumbers;
         }
 
-        private void ProcessSingleFile(string file, VersionArgs versionArgs, List<Tuple<string, string>> updatedVersionNumbers)
+        private void ProcessSingleFile(string file, VersionArgs versionArgs, List<VersionUpdate> updatedVersionNumbers)
         {
             LogIfVerbose($"Processing file: {file}", versionArgs);
 
@@ -114,7 +118,7 @@ namespace stampver
                 if (result.LineWasModified)
                 {
                     fileHasBeenModified = true;
-                    updatedVersionNumbers.Add(new Tuple<string, string>(result.NewVersionNumber, file));
+                    updatedVersionNumbers.Add(new VersionUpdate(result.NewVersionNumber, file));
                 }
                 fileLines[i] = result.Line;
             }
@@ -127,7 +131,7 @@ namespace stampver
             _ioWrapper.WriteFileLinesToFile(fileLines, file);
         }
 
-        private void WriteSummary(List<Tuple<string, string>> updatedVersionNumbers)
+        private void WriteSummary(List<VersionUpdate> updatedVersionNumbers)
         {
             // We're neither in quiet mode nor verbose mode, so output all new
             // version numbers generated along with the occurence count and file count.
@@ -135,10 +139,17 @@ namespace stampver
             // v0.3.0 (2 occurrences in 1 file)
             // v1.0.1 (4 occurrences in 2 files)
             // v1.1.0 (1 occurence in 1 file)
-            var results = updatedVersionNumbers.GroupBy(v => v)
-                .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
-                .GroupBy(v => v.VersionNumber)
-                .Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
+            // For each new version, FileCount is the number of distinct files it
+            // landed in, and OccurenceCount is the total number of attribute
+            // matches replaced (a single file can contribute >1 occurrence).
+            var results = updatedVersionNumbers
+                .GroupBy(u => u.VersionNumber)
+                .Select(g => new
+                {
+                    VersionNumber = g.Key,
+                    FileCount = g.Select(u => u.FileName).Distinct().Count(),
+                    OccurenceCount = g.Count()
+                });
 
             foreach (var result in results)
             {
