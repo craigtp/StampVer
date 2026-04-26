@@ -57,6 +57,11 @@ namespace stampver
             Console.WriteLine(output);
         }
 
+        public void WriteToStdErr(string output)
+        {
+            Console.Error.WriteLine(output);
+        }
+
         // Uses StreamReader's built-in BOM detection. CurrentEncoding only reflects the BOM
         // after the first read, so we Peek() once before reading it. Falls back to UTF-8
         // without BOM when no recognised BOM is present.

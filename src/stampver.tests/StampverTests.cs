@@ -16,13 +16,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { string.Empty });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "must specify a valid version number command");
         }
 
         [Test]
@@ -33,9 +35,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "--help" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "stampver by Craig Phillips <craig@craigtp.co.uk>");
@@ -51,13 +54,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-i'.");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Missing required value for option '-i'.");
         }
 
         [Test]
@@ -68,13 +73,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-d'.");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Missing required value for option '-d'.");
         }
 
         [Test]
@@ -85,13 +92,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Missing required value for option '-e'.");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Missing required value for option '-e'.");
         }
 
         [Test]
@@ -102,13 +111,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-x" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "must specify a valid version number command");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "must specify a valid version number command");
         }
         
         [Test]
@@ -119,13 +130,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "1.0.0", "--quiet", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Quiet and Verbose options are mutually exclusive!");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Quiet and Verbose options are mutually exclusive!");
         }
         #endregion
 
@@ -138,9 +151,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
@@ -156,9 +170,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.0.1.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
@@ -174,9 +189,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
@@ -192,9 +208,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "2.0.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
@@ -210,13 +227,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -229,9 +248,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
@@ -247,9 +267,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
@@ -265,9 +286,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
@@ -283,9 +305,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "0.0.0.0 (2 occurrences in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
@@ -301,13 +324,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -320,9 +345,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "5.6.7 (6 occurrences in 3 files)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
@@ -336,13 +362,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
         }
         #endregion
 
@@ -355,9 +383,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
@@ -371,9 +400,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
@@ -387,9 +417,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
@@ -403,9 +434,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
@@ -421,13 +453,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -440,9 +474,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
@@ -456,9 +491,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
@@ -472,9 +508,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
@@ -488,9 +525,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
@@ -506,13 +544,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -525,9 +565,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
@@ -542,13 +583,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--quiet" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
         }
         #endregion
 
@@ -561,9 +604,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
@@ -584,9 +628,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.1.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
@@ -607,9 +652,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.1.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.4.0\")]");
@@ -630,9 +676,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.0.0\")]");
@@ -653,13 +700,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -672,9 +721,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
 
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
@@ -696,9 +746,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
@@ -719,9 +770,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
@@ -742,9 +794,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"0.3.0\")]");
@@ -765,13 +818,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -784,9 +839,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
@@ -807,13 +863,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--verbose" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
         }
         #endregion
 
@@ -826,9 +884,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -848,9 +907,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "build", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -870,9 +930,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "minor", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -892,9 +953,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "major", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -914,13 +976,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "incorrect", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -933,9 +997,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -955,9 +1020,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -977,9 +1043,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "minor", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -999,9 +1066,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "major", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -1021,13 +1089,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "incorrect", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
         }
         #endregion
 
@@ -1040,9 +1110,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
@@ -1062,13 +1133,15 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-e", "THIS.IS.NOT.A.VERSION.NUMBER", "--dryrun" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
         }
         #endregion
 
@@ -1092,9 +1165,10 @@ namespace stampver.Tests
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch" });
 
             // Act
-            sut.Run();
+            var exitCode = sut.Run();
 
             // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             AssertContains(fakeIOWrapper.StdOutputLines, "2.4.7 (1 occurrence in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.4.7\")]");
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "occurence");

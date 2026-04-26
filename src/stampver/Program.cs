@@ -2,11 +2,11 @@
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             IIOWrapper ioWrapper = new IoWrapper();
             var stampverProgram = new Stampver(ioWrapper, args);
-            stampverProgram.Run();
+            return stampverProgram.Run();
         }
     }
 }

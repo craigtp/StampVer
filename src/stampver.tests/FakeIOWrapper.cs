@@ -9,6 +9,7 @@ namespace stampver.Tests
     {
         public List<string> FileLinesOutput { get; set; }
         public List<string> StdOutputLines { get; set; }
+        public List<string> StdErrorLines { get; set; }
 
         // When set, these override the default (File1/File2/File3) fixture so
         // individual tests can exercise edge cases that the default data can't
@@ -20,6 +21,7 @@ namespace stampver.Tests
         {
             FileLinesOutput = new List<string>();
             StdOutputLines = new List<string>();
+            StdErrorLines = new List<string>();
         }
 
         public FakeIOWrapper(IReadOnlyList<string> files, IReadOnlyDictionary<string, string> fileContents)
@@ -185,6 +187,11 @@ using System.Runtime.InteropServices;
         public void WriteToStdOut(string output)
         {
             StdOutputLines.Add(output);
+        }
+
+        public void WriteToStdErr(string output)
+        {
+            StdErrorLines.Add(output);
         }
     }
 }

@@ -31,17 +31,17 @@ namespace stampver
         // both AssemblyVersion and AssemblyFileVersion attributes.
         private readonly record struct VersionUpdate(string VersionNumber, string FileName);
 
-        public void Run()
+        public int Run()
         {
             if (!TryParseArguments(out var versionArgs))
             {
-                return;
+                return ExitCodes.UsageError;
             }
 
             if (versionArgs.DisplayHelp)
             {
                 DisplayHelpText();
-                return;
+                return ExitCodes.Success;
             }
 
             var pattern = string.IsNullOrEmpty(versionArgs.FilePattern)
@@ -54,6 +54,8 @@ namespace stampver
             {
                 WriteSummary(updatedVersionNumbers);
             }
+
+            return ExitCodes.Success;
         }
 
         private bool TryParseArguments(out VersionArgs versionArgs)
@@ -87,9 +89,11 @@ namespace stampver
             }
             catch (OptionException e)
             {
-                _ioWrapper.WriteToStdOut("error: ");
-                _ioWrapper.WriteToStdOut(e.Message);
-                _ioWrapper.WriteToStdOut("Try 'stampver --help' for more information.");
+                // Errors go to stderr (not stdout) so callers can pipe stdout cleanly,
+                // and so that --quiet doesn't suppress error visibility. The combined
+                // single message replaces three separate WriteToStdOut calls that
+                // previously fragmented the diagnostic across multiple lines.
+                _ioWrapper.WriteToStdErr($"error: {e.Message}{System.Environment.NewLine}Try 'stampver --help' for more information.");
                 versionArgs = args;
                 return false;
             }

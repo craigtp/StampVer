@@ -9,5 +9,6 @@ namespace stampver
         string[] ReadAllLinesFromFile(string file);
         void WriteFileLinesToFile(IEnumerable<string> fileLines, string file);
         void WriteToStdOut(string output);
+        void WriteToStdErr(string output);
     }
 }
