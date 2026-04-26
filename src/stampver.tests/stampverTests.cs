@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using static stampver.Tests.TestHelpers;
 
-// ReSharper disable InconsistentNaming
-
 namespace stampver.Tests
 {
     [TestFixture]
-    public class stampverTests
+    public class StampverTests
     {
         #region Miscellaneous Tests
         [Test]
@@ -216,14 +214,15 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number part specified");
         }
         #endregion
 
         #region Decrement version number tests
         [Test]
-        public void CallingStampverWithDecrementPatchCommand_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommand_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -241,7 +240,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommand_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommand_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -259,7 +258,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMinorCommand_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMinorCommand_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -277,7 +276,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMajorCommand_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMajorCommand_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -341,7 +340,8 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdOutputLines, "error:");
             AssertContains(fakeIOWrapper.StdOutputLines, "Invalid version number specified");
         }
         #endregion
@@ -433,7 +433,7 @@ namespace stampver.Tests
 
         #region Decrement version number tests with quiet
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithQuiet_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -449,7 +449,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithQuiet_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -465,7 +465,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMinorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMinorCommandWithQuiet_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -481,7 +481,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMajorCommandWithQuiet_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMajorCommandWithQuiet_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -665,7 +665,7 @@ namespace stampver.Tests
 
         #region Decrement version number tests with verbose
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithVerbose_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -689,7 +689,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithVerbose_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -712,7 +712,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMinorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMinorCommandWithVerbose_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -735,7 +735,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMajorCommandWithVerbose_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMajorCommandWithVerbose_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -926,7 +926,7 @@ namespace stampver.Tests
 
         #region Decrement version number tests with dryrun
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithDryrun_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -948,7 +948,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithDryrun_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -970,7 +970,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMinorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMinorCommandWithDryrun_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -992,7 +992,7 @@ namespace stampver.Tests
         }
 
         [Test]
-        public void CallingStampverWithDecrementMajorCommandWithDryrun_IncrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementMajorCommandWithDryrun_DecrementsAndOutputsNewVersion()
         {
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
