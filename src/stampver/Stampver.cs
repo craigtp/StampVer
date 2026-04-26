@@ -9,6 +9,13 @@ namespace stampver
 {
     public class Stampver
     {
+        // Compiled once at first use and reused for every line of every file.
+        // Hoisting this out of ProcessFileLine avoids re-parsing the pattern
+        // on every iteration; RegexOptions.Compiled emits IL for faster matching.
+        private static readonly Regex VersionRegex = new(
+            @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private readonly IIOWrapper _ioWrapper;
         private readonly string[] _programArgs;
 
@@ -148,14 +155,12 @@ namespace stampver
 
         private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {
-            var regex = new Regex(@"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)");
-
             // Ignore comment lines.
             if (fileLine.Trim().StartsWith(@"//"))
             {
                 return new ProcessedLineResult(fileLine, false, null);
             }
-            var match = regex.Match(fileLine);
+            var match = VersionRegex.Match(fileLine);
             if (!match.Success) return new ProcessedLineResult(fileLine, false, null);
 
             string replacedVersionNumber;
