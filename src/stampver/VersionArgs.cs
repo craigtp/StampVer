@@ -92,12 +92,20 @@ namespace stampver
             {
                 OutputType = OutputType.Verbose;
             }
-            if (string.IsNullOrEmpty(FilePattern)) return;
+            
+            // Validate the pattern eagerly without forcing a full filesystem walk.
             try
             {
-                Directory.EnumerateFiles(Directory.GetCurrentDirectory(), FilePattern, SearchOption.AllDirectories);
+                // Triggers ArgumentException for invalid characters in the pattern itself.
+                _ = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), FilePattern));
+
+                // Force at least one MoveNext() so EnumerateFiles validates its inputs.
+                using var enumerator = Directory
+                    .EnumerateFiles(Directory.GetCurrentDirectory(), FilePattern, SearchOption.AllDirectories)
+                    .GetEnumerator();
+                enumerator.MoveNext();
             }
-            catch (Exception)
+            catch (ArgumentException)
             {
                 throw new OptionException("Invalid file pattern specified!", string.Empty);
             }
