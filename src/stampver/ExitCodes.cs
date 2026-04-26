@@ -12,5 +12,8 @@ namespace stampver
 
         /// <summary>The user supplied invalid command-line arguments.</summary>
         public const int UsageError = 64;
+
+        /// <summary>An unhandled internal error or OS-level failure occurred (permission denied, locked file, etc.).</summary>
+        public const int UnexpectedError = 70;
     }
 }
