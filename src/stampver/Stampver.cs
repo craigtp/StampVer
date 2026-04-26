@@ -18,35 +18,12 @@ namespace stampver
             _programArgs = programArgs;
         }
 
+        private const string DefaultFilePattern = "AssemblyInfo.cs";
+
         public void Run()
         {
-            var versionArgs = new VersionArgs();
-
-            var p = new OptionSet()
+            if (!TryParseArguments(out var versionArgs))
             {
-                {"i=", "command to increment the version number", v => versionArgs.SetIncrement(v) },
-                {"d=", "command to decrement the version number", v => versionArgs.SetDecrement(v) },
-                {"e=", "command to explicitly set the complete version number", v => versionArgs.SetExplicit(v) },
-                {"quiet", "do not output anything to the console", _ => versionArgs.SetQuiet() },
-                {"verbose", "output verbose information to the console", _ => versionArgs.SetVerbose() },
-                {"dryrun", "perform a dry run and don't update any files", _ => versionArgs.SetDryrun() },
-                {"help", "command to increment the version number", _ => versionArgs.SetDisplayHelp() }
-            };
-
-            try
-            {
-                var extra = p.Parse(_programArgs);
-                if (extra.Count > 0)
-                {
-                    versionArgs.SetFilePattern(extra.First());
-                }
-                versionArgs.ValidateArgs();
-            }
-            catch (OptionException e)
-            {
-                _ioWrapper.WriteToStdOut("error: ");
-                _ioWrapper.WriteToStdOut(e.Message);
-                _ioWrapper.WriteToStdOut("Try 'stampver --help' for more information.");
                 return;
             }
 
@@ -56,62 +33,116 @@ namespace stampver
                 return;
             }
 
-            var fileToSearch = "AssemblyInfo.cs";
-            if (!string.IsNullOrEmpty(versionArgs.FilePattern))
-            {
-                fileToSearch = versionArgs.FilePattern;
-            }
+            var pattern = string.IsNullOrEmpty(versionArgs.FilePattern)
+                ? DefaultFilePattern
+                : versionArgs.FilePattern;
 
-            var updatedVersionNumbers = new List<Tuple<string, string>>();
-            foreach (var file in _ioWrapper.EnumerateFiles(fileToSearch))
-            {
-                LogIfVerbose($"Processing file: {file}", versionArgs);
+            var updatedVersionNumbers = ProcessFiles(pattern, versionArgs);
 
-                var fileLines = _ioWrapper.ReadAllLinesFromFile(file);
-                var fileHasBeenModified = false;
-
-                for (var i = 0; i < fileLines.Length; i++)
-                {
-                    var result = ProcessFileLine(fileLines[i], i+1, versionArgs);
-                    if (result.LineWasModified)
-                    {
-                        fileHasBeenModified = true;
-                        updatedVersionNumbers.Add(new Tuple<string, string>(result.NewVersionNumber, file));
-                    }
-                    fileLines[i] = result.Line;
-                }
-
-                if (versionArgs.IsDryrun || !fileHasBeenModified)
-                {
-                    continue;
-                }
-
-                _ioWrapper.WriteFileLinesToFile(fileLines, file);
-            }
             if (versionArgs.OutputType == OutputType.NotSet)
             {
-                // We're neither in quiet mode nor verbose mode, so output all new
-                // version numbers generated along with the occurence count and file count.
-                // i.e.
-                // v0.3.0 (2 occurrences in 1 file)
-                // v1.0.1 (4 occurrences in 2 files)
-                // v1.1.0 (1 occurence in 1 file)
-                var results = updatedVersionNumbers.GroupBy(v => v)
-                    .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
-                    .GroupBy(v => v.VersionNumber)
-                    .Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
+                WriteSummary(updatedVersionNumbers);
+            }
+        }
 
-                foreach (var result in results)
+        private bool TryParseArguments(out VersionArgs versionArgs)
+        {
+            // The OptionSet lambdas need to close over a real local — out parameters
+            // can't be captured by anonymous methods. We assign back to versionArgs
+            // before each return path.
+            var args = new VersionArgs();
+
+            var p = new OptionSet
+            {
+                {"i=", "command to increment the version number", v => args.SetIncrement(v) },
+                {"d=", "command to decrement the version number", v => args.SetDecrement(v) },
+                {"e=", "command to explicitly set the complete version number", v => args.SetExplicit(v) },
+                {"quiet", "do not output anything to the console", _ => args.SetQuiet() },
+                {"verbose", "output verbose information to the console", _ => args.SetVerbose() },
+                {"dryrun", "perform a dry run and don't update any files", _ => args.SetDryrun() },
+                {"help", "command to increment the version number", _ => args.SetDisplayHelp() }
+            };
+
+            try
+            {
+                var extra = p.Parse(_programArgs);
+                if (extra.Count > 0)
                 {
-                    // We could use string interpolation here but it looks messy.  string.Format is much more readable.
-                    // ReSharper disable once UseStringInterpolation
-                    _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
-                            result.VersionNumber,
-                            result.OccurenceCount, 
-                            result.OccurenceCount > 1 ? "occurrences" : "occurence",
-                            result.FileCount,
-                            result.FileCount > 1 ? "files" : "file"));
+                    args.SetFilePattern(extra.First());
                 }
+                args.ValidateArgs();
+                versionArgs = args;
+                return true;
+            }
+            catch (OptionException e)
+            {
+                _ioWrapper.WriteToStdOut("error: ");
+                _ioWrapper.WriteToStdOut(e.Message);
+                _ioWrapper.WriteToStdOut("Try 'stampver --help' for more information.");
+                versionArgs = args;
+                return false;
+            }
+        }
+
+        private List<Tuple<string, string>> ProcessFiles(string pattern, VersionArgs versionArgs)
+        {
+            var updatedVersionNumbers = new List<Tuple<string, string>>();
+            foreach (var file in _ioWrapper.EnumerateFiles(pattern))
+            {
+                ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
+            }
+            return updatedVersionNumbers;
+        }
+
+        private void ProcessSingleFile(string file, VersionArgs versionArgs, List<Tuple<string, string>> updatedVersionNumbers)
+        {
+            LogIfVerbose($"Processing file: {file}", versionArgs);
+
+            var fileLines = _ioWrapper.ReadAllLinesFromFile(file);
+            var fileHasBeenModified = false;
+
+            for (var i = 0; i < fileLines.Length; i++)
+            {
+                var result = ProcessFileLine(fileLines[i], i + 1, versionArgs);
+                if (result.LineWasModified)
+                {
+                    fileHasBeenModified = true;
+                    updatedVersionNumbers.Add(new Tuple<string, string>(result.NewVersionNumber, file));
+                }
+                fileLines[i] = result.Line;
+            }
+
+            if (versionArgs.IsDryrun || !fileHasBeenModified)
+            {
+                return;
+            }
+
+            _ioWrapper.WriteFileLinesToFile(fileLines, file);
+        }
+
+        private void WriteSummary(List<Tuple<string, string>> updatedVersionNumbers)
+        {
+            // We're neither in quiet mode nor verbose mode, so output all new
+            // version numbers generated along with the occurence count and file count.
+            // i.e.
+            // v0.3.0 (2 occurrences in 1 file)
+            // v1.0.1 (4 occurrences in 2 files)
+            // v1.1.0 (1 occurence in 1 file)
+            var results = updatedVersionNumbers.GroupBy(v => v)
+                .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
+                .GroupBy(v => v.VersionNumber)
+                .Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
+
+            foreach (var result in results)
+            {
+                // We could use string interpolation here but it looks messy.  string.Format is much more readable.
+                // ReSharper disable once UseStringInterpolation
+                _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
+                        result.VersionNumber,
+                        result.OccurenceCount,
+                        result.OccurenceCount > 1 ? "occurrences" : "occurence",
+                        result.FileCount,
+                        result.FileCount > 1 ? "files" : "file"));
             }
         }
 
