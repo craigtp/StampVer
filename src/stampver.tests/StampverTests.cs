@@ -373,6 +373,31 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdErrorLines, "error:");
             AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
         }
+
+        [Test]
+        public void CallingStampverWithExplicitCommandAndOutOfRangeVersionPart_OutputsErrorText()
+        {
+            // The "[\d]{1,5}" regex in VersionArgs.SetExplicit accepts up to 5 digits
+            // per part, so values above UInt16.MaxValue (65535) pass the regex and
+            // are caught only by the explicit "> 65535" guard. This test exercises
+            // that guard — without it, stampver would silently accept invalid
+            // assembly versions and write them to disk.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "65536.0.0" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
+        }
         #endregion
 
         #region Increment version number tests with quiet
