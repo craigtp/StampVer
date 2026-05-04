@@ -98,7 +98,13 @@ namespace stampver
             {
                 OutputType = OutputType.Verbose;
             }
-            
+            // Promote the sentinel default so callers downstream can rely on a
+            // concrete mode (Quiet/Normal/Verbose) without re-checking NotSet.
+            if (OutputType == OutputType.NotSet)
+            {
+                OutputType = OutputType.Normal;
+            }
+
             // Validate the pattern eagerly without forcing a full filesystem walk.
             try
             {
@@ -181,8 +187,11 @@ namespace stampver
 
     internal enum OutputType
     {
+        // Sentinel: parser hasn't observed --quiet/--verbose yet. ValidateArgs
+        // upgrades this to Normal so the rest of the pipeline never sees NotSet.
         NotSet = 0,
         Quiet = 1,
         Verbose = 2,
+        Normal = 3,
     }
 }

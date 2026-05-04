@@ -43,7 +43,7 @@ namespace stampver
 
             var updatedVersionNumbers = ProcessFiles(pattern, versionArgs);
 
-            if (versionArgs.OutputType == OutputType.NotSet)
+            if (versionArgs.OutputType == OutputType.Normal)
             {
                 WriteSummary(updatedVersionNumbers);
             }
