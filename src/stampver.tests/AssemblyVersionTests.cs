@@ -54,6 +54,40 @@ namespace stampver.Tests
             Assert.That(sut.GetVersionString(), Is.EqualTo("2.0.*"));
         }
 
+        [Test]
+        public void Increment_WithMinorPartAndPositivePatch_ResetsPatchToZero()
+        {
+            // Pins the IncrementMinor cascade rule. Every default Stampver fixture
+            // has patch=0, so the reset is invisible through the pipeline tests —
+            // a regression that dropped the cascade reset on minor would not be
+            // caught at the integration level.
+            // Arrange
+            var sut = new AssemblyVersion("1.5.10");
+
+            // Act
+            sut.Increment(VersionNumberPart.Minor);
+
+            // Assert
+            Assert.That(sut.GetVersionString(), Is.EqualTo("1.6.0"));
+        }
+
+        [Test]
+        public void Increment_WithMajorPartAnd4PartVersion_DoesNotResetRevision()
+        {
+            // Pins the cascade upper-bound at index 2 (patch). Revision is at
+            // index 3 and must NOT be reset, even though it's a numeric part —
+            // historical AssemblyVersion semantics. Default 4-part fixture has
+            // revision=0, so this contract isn't observable via the pipeline tests.
+            // Arrange
+            var sut = new AssemblyVersion("1.5.10.20");
+
+            // Act
+            sut.Increment(VersionNumberPart.Major);
+
+            // Assert
+            Assert.That(sut.GetVersionString(), Is.EqualTo("2.0.0.20"));
+        }
+
         [TestCase("65535.5.10", VersionNumberPart.Major)]
         [TestCase("5.65535.10", VersionNumberPart.Minor)]
         [TestCase("5.10.65535", VersionNumberPart.Patch)]
@@ -90,6 +124,24 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(sut.GetVersionString(), Is.EqualTo("1.2.4"));
+        }
+
+        [Test]
+        public void Decrement_WithMinorPartAndPositivePatch_PreservesPatch()
+        {
+            // Pins the no-cascade contract for decrement. Decrement must NEVER
+            // reset siblings, even when the targeted part is reduced. Every
+            // default fixture has patch=0, so a regression that introduced a
+            // cascade reset on decrement-minor would be invisible at the
+            // pipeline level.
+            // Arrange
+            var sut = new AssemblyVersion("1.5.10");
+
+            // Act
+            sut.Decrement(VersionNumberPart.Minor);
+
+            // Assert
+            Assert.That(sut.GetVersionString(), Is.EqualTo("1.4.10"));
         }
 
         [Test]
