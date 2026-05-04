@@ -25,6 +25,7 @@ namespace stampver
         }
 
         private const string DefaultFilePattern = "AssemblyInfo.cs";
+        private const string CommentLineMarker = "//";
 
         // One entry is added per modified line. Multiple entries with the same
         // (VersionNumber, FileName) pair are expected — e.g. when a file has
@@ -175,7 +176,7 @@ namespace stampver
         private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {
             // Ignore comment lines.
-            if (fileLine.Trim().StartsWith(@"//"))
+            if (fileLine.Trim().StartsWith(CommentLineMarker))
             {
                 return new ProcessedLineResult(fileLine, false, null);
             }

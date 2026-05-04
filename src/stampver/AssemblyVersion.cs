@@ -4,6 +4,11 @@ namespace stampver
 {
     public class AssemblyVersion
     {
+        // Each numeric part is bounded by ushort.MaxValue (65535) — the historical
+        // limit for AssemblyVersion attribute parts. Increment is a no-op once a
+        // part reaches this; decrement is a no-op at 0 (see Decrement* methods).
+        private const int MaxVersionPart = ushort.MaxValue;
+
         private readonly string _majorString;
         private readonly string _minorString;
         private readonly string _patchString;
@@ -59,7 +64,7 @@ namespace stampver
 
         private void IncrementMajor()
         {
-            if (_majorInt != null && _majorInt < UInt16.MaxValue)
+            if (_majorInt != null && _majorInt < MaxVersionPart)
             {
                 _majorInt++;
 
@@ -85,7 +90,7 @@ namespace stampver
 
         private void IncrementMinor()
         {
-            if (_minorInt != null && _minorInt < UInt16.MaxValue)
+            if (_minorInt != null && _minorInt < MaxVersionPart)
             {
                 _minorInt++;
 
@@ -107,7 +112,7 @@ namespace stampver
 
         private void IncrementPatch()
         {
-            if (_patchInt != null && _patchInt < UInt16.MaxValue)
+            if (_patchInt != null && _patchInt < MaxVersionPart)
             {
                 _patchInt++;
             }
