@@ -137,7 +137,7 @@ namespace stampver
 
         private static void AssertVersionNumberPartIsValid(string versionPart)
         {
-            if (versionPart == null) throw new ArgumentNullException(nameof(versionPart));
+            ArgumentNullException.ThrowIfNull(versionPart);
 
             if (!Regex.IsMatch(versionPart, @"MAJOR|MINOR|PATCH|BUILD", RegexOptions.IgnoreCase))
             {

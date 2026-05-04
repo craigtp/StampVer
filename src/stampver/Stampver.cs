@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -120,7 +121,9 @@ namespace stampver
                 if (result.LineWasModified)
                 {
                     fileHasBeenModified = true;
-                    updatedVersionNumbers.Add(new VersionUpdate(result.NewVersionNumber, file));
+                    // ProcessFileLine guarantees NewVersionNumber is non-null whenever
+                    // LineWasModified is true (see the modified-line return path).
+                    updatedVersionNumbers.Add(new VersionUpdate(result.NewVersionNumber!, file));
                 }
                 fileLines[i] = result.Line;
             }
@@ -167,7 +170,7 @@ namespace stampver
         private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {
             // Ignore comment lines.
-            if (fileLine.Trim().StartsWith(CommentLineMarker))
+            if (fileLine.Trim().StartsWith(CommentLineMarker, StringComparison.Ordinal))
             {
                 return new ProcessedLineResult(fileLine, false, null);
             }
@@ -209,8 +212,10 @@ namespace stampver
 
         private void DisplayHelpText()
         {
+            // <AssemblyVersion> is set in the csproj, so Version is never null in
+            // practice — but the BCL contract is nullable, so guard defensively.
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
+            var versionString = version is null ? "unknown" : $"{version.Major}.{version.Minor}.{version.Build}";
             var helpText = @"
 stampver by Craig Phillips <craig@craigtp.co.uk>
 ================================================

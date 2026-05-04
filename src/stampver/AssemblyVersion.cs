@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace stampver
 {
@@ -87,7 +88,7 @@ namespace stampver
             var parts = new string[_originalParts.Length];
             for (var i = 0; i < parts.Length; i++)
             {
-                parts[i] = _parsed[i]?.ToString() ?? _originalParts[i];
+                parts[i] = _parsed[i]?.ToString(CultureInfo.InvariantCulture) ?? _originalParts[i];
             }
             return string.Join('.', parts);
         }

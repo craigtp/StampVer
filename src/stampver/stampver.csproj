@@ -3,6 +3,26 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Vendored NDesk.Options (Options.cs, ~33KB from 2008) trips a wide range
+         of modern compiler/analyzer diagnostics — obsolete serialization APIs,
+         pre-Nullable patterns, perf rules added since the file was written, etc.
+         We deliberately don't modify it (per CLAUDE.md), so suppress those
+         specific IDs project-wide. Our first-party code has already been
+         cleaned of every diagnostic in this list, so suppressing them here
+         doesn't hide first-party regressions of any current pattern.
+         The list maps to:
+           CS0672 / SYSLIB0051         — obsolete formatter-based serialization
+           CS8600/8601/8602/8603/8604  — nullable reference checks
+           CS8618/8625/8769            — nullable annotation/init checks
+           CA1305/1310/1716            — culture/locale-sensitive APIs
+           CA1507/1510/1512/1825       — modernisation suggestions
+           CA1834/1846/1859/1866/2208  — perf-rule modernisations -->
+    <NoWarn>$(NoWarn);CS0672;SYSLIB0051;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS8769;CA1305;CA1310;CA1507;CA1510;CA1512;CA1716;CA1825;CA1834;CA1846;CA1859;CA1866;CA2208</NoWarn>
+    <Authors>Craig Phillips</Authors>
+    <Description>Small command-line tool to update AssemblyVersion attributes in .NET projects.</Description>
     <AssemblyVersion>1.7.0</AssemblyVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>

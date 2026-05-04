@@ -2,7 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsPackable>false</IsPackable>
+    <!-- CA1861 fires on every "new[] { ... }" passed to Stampver in test calls.
+         The rule targets hot loops; one-shot test invocations don't pay the
+         allocation cost it warns about. Refactoring 70+ sites would add a
+         field-per-test-case for no measurable benefit, so suppress globally. -->
+    <NoWarn>$(NoWarn);CA1861</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

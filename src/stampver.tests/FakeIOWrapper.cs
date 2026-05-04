@@ -14,13 +14,13 @@ namespace stampver.Tests
         // When set, EnumerateFiles throws this exception instead of returning
         // a file list. Lets tests exercise the unhandled-exception path in
         // Program.RunWithIoWrapper without touching the real filesystem.
-        public Exception ExceptionToThrowOnEnumerate { get; set; }
+        public Exception? ExceptionToThrowOnEnumerate { get; set; }
 
         // When set, these override the default (File1/File2/File3) fixture so
         // individual tests can exercise edge cases that the default data can't
         // represent — e.g. exactly one attribute in exactly one file.
-        private readonly IReadOnlyList<string> _customFiles;
-        private readonly IReadOnlyDictionary<string, string> _customFileContents;
+        private readonly IReadOnlyList<string>? _customFiles;
+        private readonly IReadOnlyDictionary<string, string>? _customFileContents;
 
         public FakeIOWrapper()
         {
@@ -33,6 +33,7 @@ namespace stampver.Tests
         {
             FileLinesOutput = new List<string>();
             StdOutputLines = new List<string>();
+            StdErrorLines = new List<string>();
             _customFiles = files;
             _customFileContents = fileContents;
         }

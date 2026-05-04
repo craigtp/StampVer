@@ -16,7 +16,7 @@ namespace stampver.Tests
             // so this guard is unreachable through the normal pipeline. This direct
             // unit test pins the contract for any future caller that bypasses the
             // regex (e.g. a programmatic API consumer).
-            var ex = Assert.Throws<ArgumentException>(() => new AssemblyVersion(versionString));
+            var ex = Assert.Throws<ArgumentException>(() => new AssemblyVersion(versionString))!;
             Assert.That(ex.Message, Is.EqualTo("versionString does not contain at least three parts."));
         }
 
