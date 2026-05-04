@@ -13,7 +13,14 @@ namespace stampver.Tests
         {
             Assert.That(ListContainsSubstring(stringList, stringToFind), Is.True, $"Expected to find: {stringToFind} but was not found in list.");
         }
-        
+
+        // Inverse of AssertContains: fails if any element in the list contains the given substring.
+        // Useful for pinning regressions where a misspelling or unwanted token must never appear.
+        public static void AssertDoesNotContain(IEnumerable<string> stringList, string stringToFind)
+        {
+            Assert.That(ListContainsSubstring(stringList, stringToFind), Is.False, $"Did not expect to find: {stringToFind} but it was present in the list.");
+        }
+
         // Simple method to allow checking if a substring exists within a list of strings, searched case-insensitively.
         private static bool ListContainsSubstring(IEnumerable<string> list, string stringSearched)
         {

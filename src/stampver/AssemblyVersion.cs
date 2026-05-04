@@ -1,166 +1,96 @@
 using System;
+using System.Globalization;
 
 namespace stampver
 {
-    public class AssemblyVersion
+    internal sealed class AssemblyVersion
     {
-        private readonly string _majorString;
-        private readonly string _minorString;
-        private readonly string _patchString;
-        private readonly string _revisionString;
+        // Each numeric part is bounded by ushort.MaxValue (65535) — the historical
+        // limit for AssemblyVersion attribute parts. Increment is a no-op once a
+        // part reaches this; decrement is a no-op at 0.
+        private const int MaxVersionPart = ushort.MaxValue;
 
-        private int? _majorInt;
-        private int? _minorInt;
-        private int? _patchInt;
-        private int? _revisionInt;
+        // AssemblyVersion attributes carry at most four parts (major.minor.patch.revision).
+        // Anything beyond that is silently truncated to preserve historical behaviour;
+        // the upstream regex in Stampver also caps matches at four parts.
+        private const int MaxParts = 4;
+
+        private readonly string[] _originalParts;
+        private readonly int?[] _parsed;
 
         public AssemblyVersion(string versionString)
         {
-            var versionElements = versionString.Split('.');
-            if (versionElements.Length < 3)
+            var split = versionString.Split('.');
+            if (split.Length < 3)
             {
                 throw new ArgumentException("versionString does not contain at least three parts.");
             }
-            _majorString = versionElements[0];
-            _minorString = versionElements[1];
-            _patchString = versionElements[2];
-            if (versionElements.Length > 3)
-            {
-                _revisionString = versionElements[3];
-            }
 
-            int majorInt;
-            if (int.TryParse(_majorString, out majorInt))
+            var length = Math.Min(split.Length, MaxParts);
+            _originalParts = new string[length];
+            _parsed = new int?[length];
+            for (var i = 0; i < length; i++)
             {
-                _majorInt = majorInt;
-            }
-
-            int minorInt;
-            if (int.TryParse(_minorString, out minorInt))
-            {
-                _minorInt = minorInt;
-            }
-
-            int patchInt;
-            if (int.TryParse(_patchString, out patchInt))
-            {
-                _patchInt = patchInt;
-            }
-
-            if (_revisionString != null)
-            {
-                int revisionInt;
-                if (int.TryParse(_revisionString, out revisionInt))
+                _originalParts[i] = split[i];
+                if (int.TryParse(split[i], out var parsed))
                 {
-                    _revisionInt = revisionInt;
+                    _parsed[i] = parsed;
                 }
             }
         }
 
-        private void IncrementMajor()
-        {
-            if (_majorInt != null && _majorInt < UInt16.MaxValue)
-            {
-                _majorInt++;
+        public void Increment(VersionNumberPart versionNumberPart) => Adjust(versionNumberPart, delta: +1, cascade: true);
 
-                // Reset the minor and patch numbers to zero when major is incremented.
-                if (_minorInt != null)
+        public void Decrement(VersionNumberPart versionNumberPart) => Adjust(versionNumberPart, delta: -1, cascade: false);
+
+        // Single source of truth for both Increment and Decrement. The cascade flag
+        // controls whether sibling parts after `part` are reset to zero — increments
+        // cascade (e.g. major bump zeroes minor and patch); decrements never do.
+        private void Adjust(VersionNumberPart part, int delta, bool cascade)
+        {
+            var index = part switch
+            {
+                VersionNumberPart.Major => 0,
+                VersionNumberPart.Minor => 1,
+                VersionNumberPart.Patch => 2,
+                _ => -1
+            };
+            if (index < 0 || _parsed[index] is null)
+            {
+                return;
+            }
+
+            var next = _parsed[index]!.Value + delta;
+            if (next < 0 || next > MaxVersionPart)
+            {
+                return;
+            }
+            _parsed[index] = next;
+
+            if (cascade)
+            {
+                // Reset every sibling from index+1 through patch (index 2). Revision
+                // (index 3) is intentionally NOT cascaded — historical AssemblyVersion
+                // semantics. Skips parts whose original token wasn't an integer
+                // (e.g. "*"), preserving the literal in GetVersionString.
+                for (var i = index + 1; i <= 2 && i < _parsed.Length; i++)
                 {
-                    _minorInt = 0;
+                    if (_parsed[i] is not null)
+                    {
+                        _parsed[i] = 0;
+                    }
                 }
-                if (_patchInt != null)
-                {
-                    _patchInt = 0;
-                }
-            }
-        }
-
-        private void DecrementMajor()
-        {
-            if (_majorInt != null && _majorInt > 0)
-            {
-                _majorInt--;
-            }
-        }
-
-        private void IncrementMinor()
-        {
-            if (_minorInt != null && _minorInt < UInt16.MaxValue)
-            {
-                _minorInt++;
-
-                // Reset patch number to zero when minor is incremented.
-                if (_patchInt != null)
-                {
-                    _patchInt = 0;
-                }
-            }
-        }
-
-        private void DecrementMinor()
-        {
-            if (_minorInt != null && _minorInt > 0)
-            {
-                _minorInt--;
-            }
-        }
-
-        private void IncrementPatch()
-        {
-            if (_patchInt != null && _patchInt < UInt16.MaxValue)
-            {
-                _patchInt++;
-            }
-        }
-
-        private void DecrementPatch()
-        {
-            if (_patchInt != null && _patchInt > 0)
-            {
-                _patchInt--;
             }
         }
 
         public string GetVersionString()
         {
-            var versionString = $"{_majorInt?.ToString() ?? _majorString}.{_minorInt?.ToString() ?? _minorString}.{_patchInt?.ToString() ?? _patchString}";
-            if (_revisionString != null)
+            var parts = new string[_originalParts.Length];
+            for (var i = 0; i < parts.Length; i++)
             {
-                versionString += $".{_revisionInt?.ToString() ?? _revisionString}";
+                parts[i] = _parsed[i]?.ToString(CultureInfo.InvariantCulture) ?? _originalParts[i];
             }
-            return versionString;
-        }
-
-        public void Increment(VersionNumberPart versionNumberPart)
-        {
-            switch (versionNumberPart)
-            {
-                case VersionNumberPart.Major:
-                    IncrementMajor();
-                    break;
-                case VersionNumberPart.Minor:
-                    IncrementMinor();
-                    break;
-                case VersionNumberPart.Patch:
-                    IncrementPatch();
-                    break;
-            }
-        }
-
-        public void Decrement(VersionNumberPart versionNumberPart)
-        {
-            switch (versionNumberPart)
-            {
-                case VersionNumberPart.Major:
-                    DecrementMajor();
-                    break;
-                case VersionNumberPart.Minor:
-                    DecrementMinor();
-                    break;
-                case VersionNumberPart.Patch:
-                    DecrementPatch();
-                    break;
-            }
+            return string.Join('.', parts);
         }
     }
 }

@@ -5,7 +5,7 @@ using NDesk.Options;
 
 namespace stampver
 {
-    public class VersionArgs
+    internal sealed class VersionArgs
     {
         public VersionNumberCommand VersionNumberCommand { get; private set; } = VersionNumberCommand.NotSet;
         public VersionNumberPart VersionNumberPart { get; private set; } = VersionNumberPart.NotSet;
@@ -46,10 +46,16 @@ namespace stampver
             VersionNumberCommand = VersionNumberCommand.Decrement;
         }
 
+        // Anchored so substrings can't slip through — without ^...$, "1.2.3.4.5.6"
+        // would match its "1.2.3" prefix and be silently accepted.
+        private static readonly Regex ExplicitVersionRegex = new(
+            @"^\d{1,5}\.\d{1,5}\.\d{1,5}$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         public void SetExplicit(string versionNumber)
         {
             AssertVersionNumberCommandNotAlreadySet();
-            if (!Regex.IsMatch(versionNumber, @"[\d]{1,5}\.[\d]{1,5}\.[\d]{1,5}", RegexOptions.IgnoreCase))
+            if (!ExplicitVersionRegex.IsMatch(versionNumber))
             {
                 throw new OptionException("Invalid version number specified", "-e");
             }
@@ -92,12 +98,26 @@ namespace stampver
             {
                 OutputType = OutputType.Verbose;
             }
-            if (string.IsNullOrEmpty(FilePattern)) return;
+            // Promote the sentinel default so callers downstream can rely on a
+            // concrete mode (Quiet/Normal/Verbose) without re-checking NotSet.
+            if (OutputType == OutputType.NotSet)
+            {
+                OutputType = OutputType.Normal;
+            }
+
+            // Validate the pattern eagerly without forcing a full filesystem walk.
             try
             {
-                Directory.EnumerateFiles(Directory.GetCurrentDirectory(), FilePattern, SearchOption.AllDirectories);
+                // Triggers ArgumentException for invalid characters in the pattern itself.
+                _ = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), FilePattern));
+
+                // Force at least one MoveNext() so EnumerateFiles validates its inputs.
+                using var enumerator = Directory
+                    .EnumerateFiles(Directory.GetCurrentDirectory(), FilePattern, SearchOption.AllDirectories)
+                    .GetEnumerator();
+                enumerator.MoveNext();
             }
-            catch (Exception)
+            catch (ArgumentException)
             {
                 throw new OptionException("Invalid file pattern specified!", string.Empty);
             }
@@ -106,7 +126,7 @@ namespace stampver
         #region Private Helper Methods
         private void SetVersionNumberPart(string versionPart)
         {
-            switch (versionPart.ToLower())
+            switch (versionPart.ToLowerInvariant())
             {
                 case "major":
                     VersionNumberPart = VersionNumberPart.Major;
@@ -123,7 +143,7 @@ namespace stampver
 
         private static void AssertVersionNumberPartIsValid(string versionPart)
         {
-            if (versionPart == null) throw new ArgumentNullException(nameof(versionPart));
+            ArgumentNullException.ThrowIfNull(versionPart);
 
             if (!Regex.IsMatch(versionPart, @"MAJOR|MINOR|PATCH|BUILD", RegexOptions.IgnoreCase))
             {
@@ -149,7 +169,7 @@ namespace stampver
         #endregion
     }
 
-    public enum VersionNumberCommand
+    internal enum VersionNumberCommand
     {
         NotSet = 0,
         Increment = 1,
@@ -157,7 +177,7 @@ namespace stampver
         ExplicitSet = 3
     }
 
-    public enum VersionNumberPart
+    internal enum VersionNumberPart
     {
         NotSet = 0,
         Major = 1,
@@ -165,10 +185,13 @@ namespace stampver
         Patch = 3
     }
 
-    public enum OutputType
+    internal enum OutputType
     {
+        // Sentinel: parser hasn't observed --quiet/--verbose yet. ValidateArgs
+        // upgrades this to Normal so the rest of the pipeline never sees NotSet.
         NotSet = 0,
         Quiet = 1,
         Verbose = 2,
+        Normal = 3,
     }
 }

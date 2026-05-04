@@ -7,124 +7,174 @@ using NDesk.Options;
 
 namespace stampver
 {
-    public class Stampver
+    internal sealed class Stampver(IIOWrapper ioWrapper, string[] programArgs)
     {
-        private readonly IIOWrapper _ioWrapper;
-        private readonly string[] _programArgs;
+        // Compiled once at first use and reused for every line of every file.
+        // Hoisting this out of ProcessFileLine avoids re-parsing the pattern
+        // on every iteration; RegexOptions.Compiled emits IL for faster matching.
+        private static readonly Regex VersionRegex = new(
+            @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        public Stampver(IIOWrapper ioWrapper, string[] programArgs)
+        private const string DefaultFilePattern = "AssemblyInfo.cs";
+        private const string CommentLineMarker = "//";
+
+        // One entry is added per modified line. Multiple entries with the same
+        // (VersionNumber, FileName) pair are expected — e.g. when a file has
+        // both AssemblyVersion and AssemblyFileVersion attributes.
+        private readonly record struct VersionUpdate(string VersionNumber, string FileName);
+
+        public int Run()
         {
-            _ioWrapper = ioWrapper;
-            _programArgs = programArgs;
-        }
-
-        public void Run()
-        {
-            var versionArgs = new VersionArgs();
-
-            var p = new OptionSet()
+            if (!TryParseArguments(out var versionArgs))
             {
-                {"i=", "command to increment the version number", v => versionArgs.SetIncrement(v) },
-                {"d=", "command to decrement the version number", v => versionArgs.SetDecrement(v) },
-                {"e=", "command to explicitly set the complete version number", v => versionArgs.SetExplicit(v) },
-                {"quiet", "do not output anything to the console", _ => versionArgs.SetQuiet() },
-                {"verbose", "output verbose information to the console", _ => versionArgs.SetVerbose() },
-                {"dryrun", "perform a dry run and don't update any files", _ => versionArgs.SetDryrun() },
-                {"help", "command to increment the version number", _ => versionArgs.SetDisplayHelp() }
-            };
-
-            try
-            {
-                var extra = p.Parse(_programArgs);
-                if (extra.Count > 0)
-                {
-                    versionArgs.SetFilePattern(extra.First());
-                }
-                versionArgs.ValidateArgs();
-            }
-            catch (OptionException e)
-            {
-                _ioWrapper.WriteToStdOut("error: ");
-                _ioWrapper.WriteToStdOut(e.Message);
-                _ioWrapper.WriteToStdOut("Try 'stampver --help' for more information.");
-                return;
+                return ExitCodes.UsageError;
             }
 
             if (versionArgs.DisplayHelp)
             {
                 DisplayHelpText();
-                return;
+                return ExitCodes.Success;
             }
 
-            var fileToSearch = "AssemblyInfo.cs";
-            if (!string.IsNullOrEmpty(versionArgs.FilePattern))
+            var pattern = string.IsNullOrEmpty(versionArgs.FilePattern)
+                ? DefaultFilePattern
+                : versionArgs.FilePattern;
+
+            var updatedVersionNumbers = ProcessFiles(pattern, versionArgs);
+
+            if (versionArgs.OutputType == OutputType.Normal)
             {
-                fileToSearch = versionArgs.FilePattern;
+                WriteSummary(updatedVersionNumbers);
             }
 
-            var updatedVersionNumbers = new List<Tuple<string, string>>();
-            foreach (var file in _ioWrapper.EnumerateFiles(fileToSearch))
+            return ExitCodes.Success;
+        }
+
+        private bool TryParseArguments(out VersionArgs versionArgs)
+        {
+            // The OptionSet lambdas need to close over a real local — out parameters
+            // can't be captured by anonymous methods. We assign back to versionArgs
+            // before each return path.
+            var args = new VersionArgs();
+
+            var p = new OptionSet
             {
-                LogIfVerbose($"Processing file: {file}", versionArgs);
+                {"i=", "command to increment the version number", v => args.SetIncrement(v) },
+                {"d=", "command to decrement the version number", v => args.SetDecrement(v) },
+                {"e=", "command to explicitly set the complete version number", v => args.SetExplicit(v) },
+                {"quiet", "do not output anything to the console", _ => args.SetQuiet() },
+                {"verbose", "output verbose information to the console", _ => args.SetVerbose() },
+                {"dryrun", "perform a dry run and don't update any files", _ => args.SetDryrun() },
+                {"help", "command to increment the version number", _ => args.SetDisplayHelp() }
+            };
 
-                var fileLines = _ioWrapper.ReadAllLinesFromFile(file);
-                var fileHasBeenModified = false;
-
-                for (var i = 0; i < fileLines.Length; i++)
+            try
+            {
+                var extra = p.Parse(programArgs);
+                if (extra.Count > 1)
                 {
-                    var result = ProcessFileLine(fileLines[i], i+1, versionArgs);
-                    if (result.LineWasModified)
-                    {
-                        fileHasBeenModified = true;
-                        updatedVersionNumbers.Add(new Tuple<string, string>(result.NewVersionNumber, file));
-                    }
-                    fileLines[i] = result.Line;
+                    // Surface dropped patterns on stderr so users notice when only
+                    // the first one is honoured (e.g. "stampver -i patch *.cs *.vb").
+                    ioWrapper.WriteToStdErr($"warning: ignoring extra arguments after '{extra[0]}'.");
                 }
-
-                if (versionArgs.IsDryrun || !fileHasBeenModified)
+                if (extra.Count > 0)
                 {
-                    continue;
+                    args.SetFilePattern(extra[0]);
                 }
-
-                _ioWrapper.WriteFileLinesToFile(fileLines, file);
+                args.ValidateArgs();
+                versionArgs = args;
+                return true;
             }
-            if (versionArgs.OutputType == OutputType.NotSet)
+            catch (OptionException e)
             {
-                // We're neither in quiet mode nor verbose mode, so output all new
-                // version numbers generated along with the occurence count and file count.
-                // i.e.
-                // v0.3.0 (2 occurrences in 1 file)
-                // v1.0.1 (4 occurrences in 2 files)
-                // v1.1.0 (1 occurence in 1 file)
-                var results = updatedVersionNumbers.GroupBy(v => v)
-                    .Select(v => new { VersionNumber = v.Key.Item1, FileName = v.Key.Item2, CountVers = v.Count() })
-                    .GroupBy(v => v.VersionNumber)
-                    .Select(v => new { VersionNumber = v.Key, FileCount = v.Count(), OccurenceCount = v.Sum(f => f.CountVers) });
-
-                foreach (var result in results)
-                {
-                    // We could use string interpolation here but it looks messy.  string.Format is much more readable.
-                    // ReSharper disable once UseStringInterpolation
-                    _ioWrapper.WriteToStdOut(string.Format("{0} ({1} {2} in {3} {4})",
-                            result.VersionNumber,
-                            result.OccurenceCount, 
-                            result.OccurenceCount > 1 ? "occurrences" : "occurence",
-                            result.FileCount,
-                            result.FileCount > 1 ? "files" : "file"));
-                }
+                // Errors go to stderr (not stdout) so callers can pipe stdout cleanly,
+                // and so that --quiet doesn't suppress error visibility. The combined
+                // single message replaces three separate WriteToStdOut calls that
+                // previously fragmented the diagnostic across multiple lines.
+                ioWrapper.WriteToStdErr($"error: {e.Message}{System.Environment.NewLine}Try 'stampver --help' for more information.");
+                versionArgs = args;
+                return false;
             }
         }
 
+        private List<VersionUpdate> ProcessFiles(string pattern, VersionArgs versionArgs)
+        {
+            var updatedVersionNumbers = new List<VersionUpdate>();
+            foreach (var file in ioWrapper.EnumerateFiles(pattern))
+            {
+                ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
+            }
+            return updatedVersionNumbers;
+        }
+
+        private void ProcessSingleFile(string file, VersionArgs versionArgs, List<VersionUpdate> updatedVersionNumbers)
+        {
+            LogIfVerbose($"Processing file: {file}", versionArgs);
+
+            var fileLines = ioWrapper.ReadAllLinesFromFile(file);
+            var fileHasBeenModified = false;
+
+            for (var i = 0; i < fileLines.Length; i++)
+            {
+                var result = ProcessFileLine(fileLines[i], i + 1, versionArgs);
+                if (result.LineWasModified)
+                {
+                    fileHasBeenModified = true;
+                    // ProcessFileLine guarantees NewVersionNumber is non-null whenever
+                    // LineWasModified is true (see the modified-line return path).
+                    updatedVersionNumbers.Add(new VersionUpdate(result.NewVersionNumber!, file));
+                }
+                fileLines[i] = result.Line;
+            }
+
+            if (versionArgs.IsDryrun || !fileHasBeenModified)
+            {
+                return;
+            }
+
+            ioWrapper.WriteFileLinesToFile(fileLines, file);
+        }
+
+        private void WriteSummary(List<VersionUpdate> updatedVersionNumbers)
+        {
+            // We're neither in quiet mode nor verbose mode, so output all new
+            // version numbers generated along with the occurrence count and file count.
+            // i.e.
+            // v0.3.0 (2 occurrences in 1 file)
+            // v1.0.1 (4 occurrences in 2 files)
+            // v1.1.0 (1 occurrence in 1 file)
+            // For each new version, FileCount is the number of distinct files it
+            // landed in, and OccurrenceCount is the total number of attribute
+            // matches replaced (a single file can contribute >1 occurrence).
+            var results = updatedVersionNumbers
+                .GroupBy(u => u.VersionNumber)
+                .Select(g => new
+                {
+                    VersionNumber = g.Key,
+                    FileCount = g.Select(u => u.FileName).Distinct().Count(),
+                    OccurrenceCount = g.Count()
+                });
+
+            foreach (var result in results)
+            {
+                var occurrences = Pluralize(result.OccurrenceCount, "occurrence", "occurrences");
+                var files = Pluralize(result.FileCount, "file", "files");
+                ioWrapper.WriteToStdOut($"{result.VersionNumber} ({occurrences} in {files})");
+            }
+        }
+
+        private static string Pluralize(int count, string singular, string plural)
+            => $"{count} {(count == 1 ? singular : plural)}";
+
         private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
         {
-            var regex = new Regex(@"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)");
-
             // Ignore comment lines.
-            if (fileLine.Trim().StartsWith(@"//"))
+            if (fileLine.Trim().StartsWith(CommentLineMarker, StringComparison.Ordinal))
             {
                 return new ProcessedLineResult(fileLine, false, null);
             }
-            var match = regex.Match(fileLine);
+            var match = VersionRegex.Match(fileLine);
             if (!match.Success) return new ProcessedLineResult(fileLine, false, null);
 
             string replacedVersionNumber;
@@ -156,14 +206,16 @@ namespace stampver
         {
             if (versionArgs.OutputType == OutputType.Verbose)
             {
-                _ioWrapper.WriteToStdOut(output);
+                ioWrapper.WriteToStdOut(output);
             }
         }
 
         private void DisplayHelpText()
         {
+            // <AssemblyVersion> is set in the csproj, so Version is never null in
+            // practice — but the BCL contract is nullable, so guard defensively.
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
+            var versionString = version is null ? "unknown" : $"{version.Major}.{version.Minor}.{version.Build}";
             var helpText = @"
 stampver by Craig Phillips <craig@craigtp.co.uk>
 ================================================
@@ -225,7 +277,7 @@ number changes will be made.
 This help text is always able to be displayed by passing --help to the program.
 
 This is version: " + versionString;
-            _ioWrapper.WriteToStdOut(helpText);
+            ioWrapper.WriteToStdOut(helpText);
         }
     }
 }
