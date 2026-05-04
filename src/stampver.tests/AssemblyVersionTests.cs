@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace stampver.Tests
 {
     [TestFixture]
-    public class AssemblyVersionTests
+    internal sealed class AssemblyVersionTests
     {
         #region Constructor tests
         [TestCase("")]

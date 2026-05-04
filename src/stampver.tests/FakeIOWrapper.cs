@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace stampver.Tests
 {
-    public class FakeIOWrapper : IIOWrapper
+    internal sealed class FakeIOWrapper : IIOWrapper
     {
         public List<string> FileLinesOutput { get; set; }
         public List<string> StdOutputLines { get; set; }

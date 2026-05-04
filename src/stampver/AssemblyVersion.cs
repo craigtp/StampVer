@@ -2,7 +2,7 @@ using System;
 
 namespace stampver
 {
-    public class AssemblyVersion
+    internal sealed class AssemblyVersion
     {
         // Each numeric part is bounded by ushort.MaxValue (65535) — the historical
         // limit for AssemblyVersion attribute parts. Increment is a no-op once a

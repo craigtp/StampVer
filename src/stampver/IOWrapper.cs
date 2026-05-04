@@ -5,7 +5,7 @@ using System.Text;
 
 namespace stampver
 {
-    public class IoWrapper : IIOWrapper
+    internal sealed class IoWrapper : IIOWrapper
     {
         public IEnumerable<string> EnumerateFiles(string fileToSearch)
         {

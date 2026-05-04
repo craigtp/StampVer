@@ -6,7 +6,7 @@ using NDesk.Options;
 
 namespace stampver
 {
-    public class Stampver
+    internal sealed class Stampver(IIOWrapper ioWrapper, string[] programArgs)
     {
         // Compiled once at first use and reused for every line of every file.
         // Hoisting this out of ProcessFileLine avoids re-parsing the pattern
@@ -14,15 +14,6 @@ namespace stampver
         private static readonly Regex VersionRegex = new(
             @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        private readonly IIOWrapper _ioWrapper;
-        private readonly string[] _programArgs;
-
-        public Stampver(IIOWrapper ioWrapper, string[] programArgs)
-        {
-            _ioWrapper = ioWrapper;
-            _programArgs = programArgs;
-        }
 
         private const string DefaultFilePattern = "AssemblyInfo.cs";
         private const string CommentLineMarker = "//";
@@ -79,12 +70,12 @@ namespace stampver
 
             try
             {
-                var extra = p.Parse(_programArgs);
+                var extra = p.Parse(programArgs);
                 if (extra.Count > 1)
                 {
                     // Surface dropped patterns on stderr so users notice when only
                     // the first one is honoured (e.g. "stampver -i patch *.cs *.vb").
-                    _ioWrapper.WriteToStdErr($"warning: ignoring extra arguments after '{extra[0]}'.");
+                    ioWrapper.WriteToStdErr($"warning: ignoring extra arguments after '{extra[0]}'.");
                 }
                 if (extra.Count > 0)
                 {
@@ -100,7 +91,7 @@ namespace stampver
                 // and so that --quiet doesn't suppress error visibility. The combined
                 // single message replaces three separate WriteToStdOut calls that
                 // previously fragmented the diagnostic across multiple lines.
-                _ioWrapper.WriteToStdErr($"error: {e.Message}{System.Environment.NewLine}Try 'stampver --help' for more information.");
+                ioWrapper.WriteToStdErr($"error: {e.Message}{System.Environment.NewLine}Try 'stampver --help' for more information.");
                 versionArgs = args;
                 return false;
             }
@@ -109,7 +100,7 @@ namespace stampver
         private List<VersionUpdate> ProcessFiles(string pattern, VersionArgs versionArgs)
         {
             var updatedVersionNumbers = new List<VersionUpdate>();
-            foreach (var file in _ioWrapper.EnumerateFiles(pattern))
+            foreach (var file in ioWrapper.EnumerateFiles(pattern))
             {
                 ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
             }
@@ -120,7 +111,7 @@ namespace stampver
         {
             LogIfVerbose($"Processing file: {file}", versionArgs);
 
-            var fileLines = _ioWrapper.ReadAllLinesFromFile(file);
+            var fileLines = ioWrapper.ReadAllLinesFromFile(file);
             var fileHasBeenModified = false;
 
             for (var i = 0; i < fileLines.Length; i++)
@@ -139,7 +130,7 @@ namespace stampver
                 return;
             }
 
-            _ioWrapper.WriteFileLinesToFile(fileLines, file);
+            ioWrapper.WriteFileLinesToFile(fileLines, file);
         }
 
         private void WriteSummary(List<VersionUpdate> updatedVersionNumbers)
@@ -166,7 +157,7 @@ namespace stampver
             {
                 var occurrences = Pluralize(result.OccurrenceCount, "occurrence", "occurrences");
                 var files = Pluralize(result.FileCount, "file", "files");
-                _ioWrapper.WriteToStdOut($"{result.VersionNumber} ({occurrences} in {files})");
+                ioWrapper.WriteToStdOut($"{result.VersionNumber} ({occurrences} in {files})");
             }
         }
 
@@ -212,7 +203,7 @@ namespace stampver
         {
             if (versionArgs.OutputType == OutputType.Verbose)
             {
-                _ioWrapper.WriteToStdOut(output);
+                ioWrapper.WriteToStdOut(output);
             }
         }
 
@@ -281,7 +272,7 @@ number changes will be made.
 This help text is always able to be displayed by passing --help to the program.
 
 This is version: " + versionString;
-            _ioWrapper.WriteToStdOut(helpText);
+            ioWrapper.WriteToStdOut(helpText);
         }
     }
 }

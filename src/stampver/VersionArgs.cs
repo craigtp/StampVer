@@ -5,7 +5,7 @@ using NDesk.Options;
 
 namespace stampver
 {
-    public class VersionArgs
+    internal sealed class VersionArgs
     {
         public VersionNumberCommand VersionNumberCommand { get; private set; } = VersionNumberCommand.NotSet;
         public VersionNumberPart VersionNumberPart { get; private set; } = VersionNumberPart.NotSet;
@@ -163,7 +163,7 @@ namespace stampver
         #endregion
     }
 
-    public enum VersionNumberCommand
+    internal enum VersionNumberCommand
     {
         NotSet = 0,
         Increment = 1,
@@ -171,7 +171,7 @@ namespace stampver
         ExplicitSet = 3
     }
 
-    public enum VersionNumberPart
+    internal enum VersionNumberPart
     {
         NotSet = 0,
         Major = 1,
@@ -179,7 +179,7 @@ namespace stampver
         Patch = 3
     }
 
-    public enum OutputType
+    internal enum OutputType
     {
         NotSet = 0,
         Quiet = 1,

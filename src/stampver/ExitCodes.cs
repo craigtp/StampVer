@@ -5,7 +5,7 @@ namespace stampver
     /// so that CI pipelines and shell scripts can distinguish between success and
     /// well-known failure modes without parsing stdout/stderr.
     /// </summary>
-    public static class ExitCodes
+    internal static class ExitCodes
     {
         /// <summary>The run completed successfully.</summary>
         public const int Success = 0;

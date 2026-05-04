@@ -6,7 +6,7 @@ using static stampver.Tests.TestHelpers;
 namespace stampver.Tests
 {
     [TestFixture]
-    public class StampverTests
+    internal sealed class StampverTests
     {
         #region Miscellaneous Tests
         [Test]
