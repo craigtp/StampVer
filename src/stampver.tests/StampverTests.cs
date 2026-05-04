@@ -375,6 +375,32 @@ namespace stampver.Tests
         }
 
         [Test]
+        public void CallingStampverWithExplicitCommandAndTooManyParts_OutputsErrorText()
+        {
+            // Regression test for the unanchored regex bug. Without "^...$", the
+            // pattern "[\d]{1,5}\.[\d]{1,5}\.[\d]{1,5}" matches the "1.2.3" prefix
+            // of "1.2.3.4.5.6", so the value passes validation and gets slammed
+            // into AssemblyInfo.cs verbatim — producing invalid attribute values
+            // like [assembly: AssemblyVersion("1.2.3.4.5.6")]. Anchoring rejects
+            // this upfront.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "1.2.3.4.5.6" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number specified");
+        }
+
+        [Test]
         public void CallingStampverWithExplicitCommandAndOutOfRangeVersionPart_OutputsErrorText()
         {
             // The "[\d]{1,5}" regex in VersionArgs.SetExplicit accepts up to 5 digits
@@ -1198,6 +1224,55 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "2.4.7 (1 occurrence in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.4.7\")]");
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "occurence");
+        }
+        #endregion
+
+        #region Extra arguments tests
+        [Test]
+        public void CallingStampverWithMultiplePositionalArguments_EmitsWarningButContinuesUsingFirst()
+        {
+            // Regression test for the silent-drop bug. Previously, a command like
+            // "stampver -i patch *.cs *.vb" would silently use only "*.cs" with no
+            // indication to the user that "*.vb" had been ignored. Now we warn on
+            // stderr but still proceed with the first pattern so that valid
+            // single-pattern usage is unaffected.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "AssemblyInfo.cs", "Extra.cs" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdErrorLines, "warning: ignoring extra arguments after 'AssemblyInfo.cs'");
+            // The first pattern still drives the run, so the FakeIOWrapper's
+            // default fixture of three files is still processed.
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.GreaterThan(0));
+        }
+        #endregion
+
+        #region Culture handling tests
+        [Test]
+        [SetCulture("tr-TR")]
+        public void CallingStampverWithIncrementMinorInTurkishCulture_StillIncrementsMinor()
+        {
+            // Regression test for the dotted-i / dotless-i bug. In tr-TR,
+            // "MINOR".ToLower() returns "mınor" (with dotless ı), which fails to
+            // match the "minor" case label, so VersionNumberPart is never set
+            // and the increment becomes a silent no-op. ToLowerInvariant fixes it.
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "MINOR" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.4.0 (4 occurrences in 2 files)");
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.1.0.0 (2 occurrences in 1 file)");
         }
         #endregion
 

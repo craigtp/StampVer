@@ -46,10 +46,16 @@ namespace stampver
             VersionNumberCommand = VersionNumberCommand.Decrement;
         }
 
+        // Anchored so substrings can't slip through — without ^...$, "1.2.3.4.5.6"
+        // would match its "1.2.3" prefix and be silently accepted.
+        private static readonly Regex ExplicitVersionRegex = new(
+            @"^\d{1,5}\.\d{1,5}\.\d{1,5}$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         public void SetExplicit(string versionNumber)
         {
             AssertVersionNumberCommandNotAlreadySet();
-            if (!Regex.IsMatch(versionNumber, @"[\d]{1,5}\.[\d]{1,5}\.[\d]{1,5}", RegexOptions.IgnoreCase))
+            if (!ExplicitVersionRegex.IsMatch(versionNumber))
             {
                 throw new OptionException("Invalid version number specified", "-e");
             }
@@ -114,7 +120,7 @@ namespace stampver
         #region Private Helper Methods
         private void SetVersionNumberPart(string versionPart)
         {
-            switch (versionPart.ToLower())
+            switch (versionPart.ToLowerInvariant())
             {
                 case "major":
                     VersionNumberPart = VersionNumberPart.Major;

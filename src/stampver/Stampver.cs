@@ -79,9 +79,15 @@ namespace stampver
             try
             {
                 var extra = p.Parse(_programArgs);
+                if (extra.Count > 1)
+                {
+                    // Surface dropped patterns on stderr so users notice when only
+                    // the first one is honoured (e.g. "stampver -i patch *.cs *.vb").
+                    _ioWrapper.WriteToStdErr($"warning: ignoring extra arguments after '{extra[0]}'.");
+                }
                 if (extra.Count > 0)
                 {
-                    args.SetFilePattern(extra.First());
+                    args.SetFilePattern(extra[0]);
                 }
                 args.ValidateArgs();
                 versionArgs = args;
