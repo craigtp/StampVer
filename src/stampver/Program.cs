@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace stampver
 {
@@ -6,7 +6,14 @@ namespace stampver
     {
         private static int Main(string[] args)
         {
-            IIOWrapper ioWrapper = new IoWrapper();
+            return RunWithIoWrapper(new IoWrapper(), args);
+        }
+
+        // Extracted so the catch path is reachable from the test suite via a
+        // FakeIOWrapper. Main itself stays a thin shim that wires up the real
+        // IoWrapper and delegates here.
+        internal static int RunWithIoWrapper(IIOWrapper ioWrapper, string[] args)
+        {
             try
             {
                 var stampverProgram = new Stampver(ioWrapper, args);

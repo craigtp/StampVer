@@ -11,6 +11,11 @@ namespace stampver.Tests
         public List<string> StdOutputLines { get; set; }
         public List<string> StdErrorLines { get; set; }
 
+        // When set, EnumerateFiles throws this exception instead of returning
+        // a file list. Lets tests exercise the unhandled-exception path in
+        // Program.RunWithIoWrapper without touching the real filesystem.
+        public Exception ExceptionToThrowOnEnumerate { get; set; }
+
         // When set, these override the default (File1/File2/File3) fixture so
         // individual tests can exercise edge cases that the default data can't
         // represent — e.g. exactly one attribute in exactly one file.
@@ -34,6 +39,10 @@ namespace stampver.Tests
 
         public IEnumerable<string> EnumerateFiles(string fileToSearch)
         {
+            if (ExceptionToThrowOnEnumerate != null)
+            {
+                throw ExceptionToThrowOnEnumerate;
+            }
             if (_customFiles != null)
             {
                 return _customFiles;

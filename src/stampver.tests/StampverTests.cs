@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using static stampver.Tests.TestHelpers;
@@ -1172,6 +1173,32 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "2.4.7 (1 occurrence in 1 file)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"2.4.7\")]");
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "occurence");
+        }
+        #endregion
+
+        #region Unhandled exception tests
+        [Test]
+        public void WhenStampverThrowsUnhandledException_ProgramReturnsUnexpectedErrorExitCodeAndWritesToStdErr()
+        {
+            // Regression test for the top-level catch in Program.RunWithIoWrapper.
+            // Forces EnumerateFiles to throw so we can verify the catch path
+            // converts the exception into ExitCodes.UnexpectedError, surfaces
+            // ex.Message on stderr, and does NOT leak a stack trace.
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper
+            {
+                ExceptionToThrowOnEnumerate = new UnauthorizedAccessException("simulated permission denied")
+            };
+
+            // Act
+            var exitCode = Program.RunWithIoWrapper(fakeIOWrapper, new[] { "-i", "MAJOR" });
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UnexpectedError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "stampver: unexpected error: simulated permission denied");
+            AssertDoesNotContain(fakeIOWrapper.StdErrorLines, "at stampver.");
         }
         #endregion
     }
