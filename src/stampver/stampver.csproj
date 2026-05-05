@@ -23,7 +23,7 @@
     <NoWarn>$(NoWarn);CS0672;SYSLIB0051;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS8769;CA1305;CA1310;CA1507;CA1510;CA1512;CA1716;CA1825;CA1834;CA1846;CA1859;CA1866;CA2208</NoWarn>
     <Authors>Craig Phillips</Authors>
     <Description>Small command-line tool to update AssemblyVersion attributes in .NET projects.</Description>
-    <AssemblyVersion>1.7.0</AssemblyVersion>
+    <AssemblyVersion>1.8.0</AssemblyVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
