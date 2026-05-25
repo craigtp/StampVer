@@ -4,7 +4,10 @@
 [![License: MIT](https://img.shields.io/github/license/craigtp/StampVer)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com/)
 
-A small command-line utility for updating .NET assembly version attributes in bulk. StampVer walks the current directory tree, finds files matching a pattern (default `AssemblyInfo.cs`), and rewrites every `[assembly: AssemblyVersion(...)]` and `[assembly: AssemblyFileVersion(...)]` attribute - incrementing or decrementing a [Semantic Versioning](https://semver.org/) part, or replacing the version outright.
+A small command-line utility for updating .NET assembly version metadata in bulk. StampVer walks the current directory tree, finds matching files, and rewrites every assembly version it finds - incrementing or decrementing a [Semantic Versioning](https://semver.org/) part, or replacing the version outright. Out of the box it handles both:
+
+- Legacy `AssemblyInfo.cs` files - `[assembly: AssemblyVersion(...)]` and `[assembly: AssemblyFileVersion(...)]` attributes.
+- Modern SDK-style `.csproj` files - `<AssemblyVersion>`, `<FileVersion>`, `<Version>`, and `<VersionPrefix>` MSBuild properties.
 
 ## Table of contents
 
@@ -19,12 +22,14 @@ A small command-line utility for updating .NET assembly version attributes in bu
 
 ## Features
 
+- **Two source formats supported** out of the box - legacy `AssemblyInfo.cs` attributes and modern SDK-style `.csproj` MSBuild properties.
 - **Increment, decrement, or explicitly set** the `MAJOR`, `MINOR`, `PATCH` (or `BUILD`) component of a version number.
 - **Semantic cascade** on increment: bumping `MAJOR` resets `MINOR` and `PATCH` to `0`; bumping `MINOR` resets `PATCH` to `0`.
-- **Preserves wildcard tokens** like `*` in `AssemblyVersion("1.0.*")` - only the numeric parts are touched.
+- **Preserves wildcard tokens** like `*` in `AssemblyVersion("1.0.*")` (`AssemblyInfo.cs` only - csproj doesn't support wildcards).
+- **Honours conditional element attributes** such as `<Version Condition="...">1.0.0</Version>`.
 - **Clamps every part to `[0, 65535]`** so generated versions remain valid .NET assembly metadata.
 - **Dry-run mode** previews the changes without writing to disk.
-- **Custom file patterns** for projects that don't use `AssemblyInfo.cs`.
+- **Custom file patterns** for projects that don't fit either default.
 - **Self-contained single-file binary** when published - no .NET runtime required on the target machine.
 - **Zero external dependencies** at runtime.
 
@@ -83,9 +88,18 @@ The `-i`, `-d`, and `-e` commands are mutually exclusive.
 
 ### File pattern
 
-An optional final positional argument specifies which files to scan. Any pattern accepted by [`Directory.EnumerateFiles`](https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefiles) works (e.g. `*.cs`, `AssemblyInfo.*`). Defaults to `AssemblyInfo.cs`.
+An optional final positional argument specifies which files to scan. Any pattern accepted by [`Directory.EnumerateFiles`](https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefiles) works (e.g. `*.cs`, `AssemblyInfo.*`, `Directory.Build.props`).
 
-A file is only modified if it contains at least one `[assembly: AssemblyVersion("x.y.z")]` or `[assembly: AssemblyFileVersion("x.y.z")]` attribute. Comment lines (`//`) are skipped.
+When no positional argument is given, StampVer scans **both** `AssemblyInfo.cs` and `*.csproj` files by default, so a typical SDK-style project works with no configuration. An explicit pattern suppresses the defaults and uses only that pattern.
+
+The file format is detected from the extension: `.csproj` files are treated as MSBuild XML, and everything else is treated as a C# attribute source file. A file is only modified if it contains at least one recognised version entry:
+
+| File extension | Recognised forms |
+| --- | --- |
+| `.csproj` | `<AssemblyVersion>x.y.z</AssemblyVersion>`, `<FileVersion>x.y.z</FileVersion>`, `<Version>x.y.z</Version>`, `<VersionPrefix>x.y.z</VersionPrefix>` (with optional attributes on the element) |
+| Everything else | `[assembly: AssemblyVersion("x.y.z")]`, `[assembly: AssemblyFileVersion("x.y.z")]` |
+
+Comment lines (`//` for C#, `<!--` for XML) are skipped. Multi-line XML block comments are matched line-by-line, so a version element inside a multi-line `<!-- ... -->` block would still be rewritten - in practice nobody comments out version elements, but worth knowing.
 
 ## Examples
 
@@ -120,10 +134,11 @@ stampver -i PATCH "Version.cs"
 The pipeline is intentionally small:
 
 1. **Parse arguments** into a `VersionArgs` aggregate; reject mutually-exclusive combinations early.
-2. **Enumerate files** matching the pattern under the current working directory.
-3. **Per line**, match `Assembly(File)?Version("...")` via a compiled regex; skip `//` comment lines.
-4. **Transform the version** through `AssemblyVersion`, which preserves non-numeric tokens (e.g. `*`) and clamps numeric parts to `[0, UInt16.MaxValue]`.
-5. **Write back** the updated lines - unless `--dryrun` is set.
+2. **Enumerate files** matching the pattern under the current working directory. When no pattern is given, the `AssemblyInfo.cs` and `*.csproj` defaults are scanned in turn.
+3. **Pick a file format** per file based on extension - the MSBuild XML matcher for `.csproj`, the C# attribute matcher otherwise.
+4. **Per line**, run the format's compiled regex; skip the format's comment marker (`//` or `<!--`).
+5. **Transform the version** through `AssemblyVersion`, which preserves non-numeric tokens (e.g. `*`) and clamps numeric parts to `[0, UInt16.MaxValue]`.
+6. **Write back** the updated lines - unless `--dryrun` is set.
 
 Default output groups results by new version, e.g.:
 

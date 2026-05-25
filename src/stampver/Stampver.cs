@@ -9,15 +9,51 @@ namespace stampver
 {
     internal sealed class Stampver(IIOWrapper ioWrapper, string[] programArgs)
     {
-        // Compiled once at first use and reused for every line of every file.
-        // Hoisting this out of ProcessFileLine avoids re-parsing the pattern
-        // on every iteration; RegexOptions.Compiled emits IL for faster matching.
-        private static readonly Regex VersionRegex = new(
-            @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
-            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        // Bundles the version-matching regex, comment marker, and default
+        // file-name pattern for one supported source-file form. The set of
+        // formats is closed (picked at runtime by file extension); there is
+        // no extensibility hook.
+        private sealed class FileFormat
+        {
+            public required Regex VersionPattern { get; init; }
+            public required string CommentMarker { get; init; }
+            public required string DefaultFilePattern { get; init; }
+        }
 
-        private const string DefaultFilePattern = "AssemblyInfo.cs";
-        private const string CommentLineMarker = "//";
+        // Legacy attribute form: [assembly: AssemblyVersion("x.y.z")] and
+        // [assembly: AssemblyFileVersion("x.y.z")]. Wildcard "*" tokens are
+        // accepted in the patch/revision positions and preserved verbatim.
+        private static readonly FileFormat AssemblyInfoFormat = new()
+        {
+            VersionPattern = new Regex(
+                @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
+                RegexOptions.Compiled | RegexOptions.CultureInvariant),
+            CommentMarker = "//",
+            DefaultFilePattern = "AssemblyInfo.cs",
+        };
+
+        // SDK-style csproj MSBuild properties: <AssemblyVersion>, <FileVersion>,
+        // <Version>, <VersionPrefix>. The optional `(?:\s[^>]*)?` allows
+        // arbitrary attributes on the element (e.g. Condition="..."). Wildcards
+        // are not supported in csproj versions, so only digits are accepted.
+        private static readonly FileFormat CsprojFormat = new()
+        {
+            VersionPattern = new Regex(
+                @"<(?<el>AssemblyVersion|FileVersion|Version|VersionPrefix)(?:\s[^>]*)?>(?<version>\d{1,5}\.\d{1,5}\.\d{1,5}(?:\.\d{1,5})?)</\k<el>>",
+                RegexOptions.Compiled | RegexOptions.CultureInvariant),
+            CommentMarker = "<!--",
+            DefaultFilePattern = "*.csproj",
+        };
+
+        // Scanned in turn when no positional file-pattern argument is given.
+        // Existing AssemblyInfo.cs users keep working unchanged; modern
+        // SDK-style csprojs are picked up automatically with no flag.
+        private static readonly FileFormat[] DefaultFormats = [AssemblyInfoFormat, CsprojFormat];
+
+        private static FileFormat FormatForFile(string filePath) =>
+            filePath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase)
+                ? CsprojFormat
+                : AssemblyInfoFormat;
 
         // One entry is added per modified line. Multiple entries with the same
         // (VersionNumber, FileName) pair are expected — e.g. when a file has
@@ -37,11 +73,7 @@ namespace stampver
                 return ExitCodes.Success;
             }
 
-            var pattern = string.IsNullOrEmpty(versionArgs.FilePattern)
-                ? DefaultFilePattern
-                : versionArgs.FilePattern;
-
-            var updatedVersionNumbers = ProcessFiles(pattern, versionArgs);
+            var updatedVersionNumbers = ProcessFiles(versionArgs);
 
             if (versionArgs.OutputType == OutputType.Normal)
             {
@@ -98,12 +130,22 @@ namespace stampver
             }
         }
 
-        private List<VersionUpdate> ProcessFiles(string pattern, VersionArgs versionArgs)
+        private List<VersionUpdate> ProcessFiles(VersionArgs versionArgs)
         {
+            // Explicit positional pattern wins outright; otherwise scan every
+            // default format's pattern in turn. The fake-IO test wrapper
+            // dispatches by pattern, so unrelated patterns don't double-count.
+            var patterns = string.IsNullOrEmpty(versionArgs.FilePattern)
+                ? DefaultFormats.Select(f => f.DefaultFilePattern).ToArray()
+                : [versionArgs.FilePattern];
+
             var updatedVersionNumbers = new List<VersionUpdate>();
-            foreach (var file in ioWrapper.EnumerateFiles(pattern))
+            foreach (var pattern in patterns)
             {
-                ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
+                foreach (var file in ioWrapper.EnumerateFiles(pattern))
+                {
+                    ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
+                }
             }
             return updatedVersionNumbers;
         }
@@ -112,12 +154,13 @@ namespace stampver
         {
             LogIfVerbose($"Processing file: {file}", versionArgs);
 
+            var format = FormatForFile(file);
             var fileLines = ioWrapper.ReadAllLinesFromFile(file);
             var fileHasBeenModified = false;
 
             for (var i = 0; i < fileLines.Length; i++)
             {
-                var result = ProcessFileLine(fileLines[i], i + 1, versionArgs);
+                var result = ProcessFileLine(fileLines[i], i + 1, format, versionArgs);
                 if (result.LineWasModified)
                 {
                     fileHasBeenModified = true;
@@ -167,14 +210,17 @@ namespace stampver
         private static string Pluralize(int count, string singular, string plural)
             => $"{count} {(count == 1 ? singular : plural)}";
 
-        private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, VersionArgs versionArgs)
+        private ProcessedLineResult ProcessFileLine(string fileLine, int fileLineNumber, FileFormat format, VersionArgs versionArgs)
         {
-            // Ignore comment lines.
-            if (fileLine.Trim().StartsWith(CommentLineMarker, StringComparison.Ordinal))
+            // Skip lines whose first non-whitespace character begins a comment
+            // for this file format ("//" for C#, "<!--" for XML). Multi-line
+            // XML block comments containing a version element would still be
+            // matched — in practice nobody comments out version elements.
+            if (fileLine.Trim().StartsWith(format.CommentMarker, StringComparison.Ordinal))
             {
                 return new ProcessedLineResult(fileLine, false, null);
             }
-            var match = VersionRegex.Match(fileLine);
+            var match = format.VersionPattern.Match(fileLine);
             if (!match.Success) return new ProcessedLineResult(fileLine, false, null);
 
             string replacedVersionNumber;
@@ -220,10 +266,13 @@ namespace stampver
 stampver by Craig Phillips <craig@craigtp.co.uk>
 ================================================
 
-A small command-line utility that will iterate through all of the
-AssemblyInfo.cs files (or other specified files) below the current folder and
-update the AssemblyVersion and AssemblyFileVersion attributes with a version
-compliant with Semantic Versioning (See: http://semver.org/).
+A small command-line utility that updates version numbers in .NET source
+files below the current folder. By default it scans both legacy
+AssemblyInfo.cs files (updating [assembly: AssemblyVersion] and
+[assembly: AssemblyFileVersion] attributes) and modern SDK-style *.csproj
+files (updating <AssemblyVersion>, <FileVersion>, <Version>, and
+<VersionPrefix> MSBuild properties). Versions are kept compliant with
+Semantic Versioning (See: http://semver.org/).
 The utility can automatically increment or decrement specific parts of the
 version number or can explicitly set the entire version string.
 
@@ -268,11 +317,15 @@ Any valid file pattern that can be passed to the .NET Directory.EnumerateFiles
 method. See here for details:
 https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.enumeratefiles
 Specifying a filepattern will search for files matching the file pattern
-(rather than AssemblyInfo.cs) in order to try to make version changes.
-Note that the way the utility matches within the file is exactly the same,
-so file must still have a string matching [assembly: AssemblyVersion(""x.y.z"")]
-or [assembly: AssemblyFileVersion(""x.y.z"")] within the file before version
-number changes will be made.
+(rather than the default AssemblyInfo.cs + *.csproj scan) in order to try
+to make version changes. The file format is detected from the extension
+(.csproj uses the MSBuild element matcher, everything else uses the C#
+attribute matcher), so a file must still contain a matching
+[assembly: AssemblyVersion(""x.y.z"")] /
+[assembly: AssemblyFileVersion(""x.y.z"")] attribute, or a matching
+<AssemblyVersion>x.y.z</AssemblyVersion>, <FileVersion>x.y.z</FileVersion>,
+<Version>x.y.z</Version>, or <VersionPrefix>x.y.z</VersionPrefix> element
+before any changes will be made.
 
 This help text is always able to be displayed by passing --help to the program.
 
