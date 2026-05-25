@@ -7,8 +7,8 @@ namespace stampver.Tests
 {
     // Exercises the REAL IoWrapper against a temporary directory. This is the only
     // fixture that touches disk — it has to, because newline/encoding preservation
-    // (code review #3) is a property of the real filesystem writer, which the
-    // FakeIOWrapper deliberately does not model. Each test cleans up after itself.
+    // is a property of the real filesystem writer, which the FakeIOWrapper
+    // deliberately does not model. Each test cleans up after itself.
     [TestFixture]
     internal sealed class IOWrapperTests
     {

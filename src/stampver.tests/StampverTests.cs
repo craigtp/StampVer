@@ -244,11 +244,11 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementPatchCommandWhenPatchAlreadyZero_MakesNoChangeAndReportsNothing()
         {
-            // Deliberate behaviour change (code review #4): the default fixtures all sit at
-            // patch 0, so decrementing patch is a no-op. A no-op must NOT be written back or
-            // reported (previously this test pinned the buggy behaviour where the unchanged
-            // version was still counted and the whole file rewritten). Real patch decrement
-            // is covered by CallingStampverWithDecrementPatchCommandWhenPatchIsNonZero_*.
+            // The default fixtures all sit at patch 0, so decrementing patch is a no-op.
+            // A no-op must NOT be written back or reported (previously this test pinned
+            // the buggy behaviour where the unchanged version was still counted and the
+            // whole file rewritten). Real patch decrement is covered by
+            // CallingStampverWithDecrementPatchCommandWhenPatchIsNonZero_*.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -266,8 +266,8 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementBuildCommandWhenPatchAlreadyZero_MakesNoChangeAndReportsNothing()
         {
-            // Deliberate behaviour change (code review #4): BUILD is a synonym for PATCH and
-            // the fixtures sit at patch 0, so this is a no-op — nothing written or reported.
+            // BUILD is a synonym for PATCH and the fixtures sit at patch 0,
+            // so this is a no-op — nothing written or reported.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -285,9 +285,8 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementPatchCommandWhenPatchIsNonZero_DecrementsPatch()
         {
-            // Positive coverage added alongside code review #4: when patch is non-zero,
-            // decrement actually lowers it. The default fixtures can't show this (they sit
-            // at patch 0), so use a custom fixture at 1.3.5.
+            // When patch is non-zero, decrement actually lowers it. The default fixtures
+            // can't show this (they sit at patch 0), so use a custom fixture at 1.3.5.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper(
@@ -346,9 +345,8 @@ namespace stampver.Tests
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
-            // Deliberate behaviour change (code review #4): File2 sits at 1.0.0.0, so its
-            // minor part is already 0 — decrement there is a no-op and is no longer counted
-            // in the summary nor written back.
+            // File2 sits at 1.0.0.0, so its minor part is already 0 —
+            // decrement there is a no-op and is no longer counted in the summary nor written back.
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "1.0.0.0 (");
             AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
@@ -576,9 +574,8 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementPatchCommandWithQuietWhenPatchAlreadyZero_MakesNoChange()
         {
-            // Deliberate behaviour change (code review #4): no-op decrement (patch already 0)
-            // writes nothing. Quiet already suppresses stdout; the point here is that no file
-            // is written either.
+            // No-op decrement (patch already 0) writes nothing. Quiet already suppresses stdout;
+            // the point here is that no file is written either.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -596,7 +593,7 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementBuildCommandWithQuietWhenPatchAlreadyZero_MakesNoChange()
         {
-            // Deliberate behaviour change (code review #4): BUILD synonym, no-op, nothing written.
+            // BUILD synonym, no-op, nothing written.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -625,8 +622,7 @@ namespace stampver.Tests
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
-            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement
-            // is a no-op, so that file is not written.
+            // File2's 1.0.0.0 minor decrement is a no-op, so that file is not written.
             AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
@@ -829,8 +825,8 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementPatchCommandWithVerboseWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
-            // Deliberate behaviour change (code review #4): a no-op decrement (patch already 0)
-            // is no longer logged as "Changed ... 1.3.0 to 1.3.0" and the file is not written.
+            // A no-op decrement (patch already 0) is no longer logged as
+            // "Changed ... 1.3.0 to 1.3.0" and the file is not written.
             // Verbose still logs which files were processed.
 
             // Arrange
@@ -852,8 +848,7 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementBuildCommandWithVerboseWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
-            // Deliberate behaviour change (code review #4): BUILD synonym, no-op — no "Changed"
-            // line and nothing written.
+            // BUILD synonym, no-op — no "Changed" line and nothing written.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -890,8 +885,8 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
             AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement is a
-            // no-op — no "Changed ... to ...1.0.0.0" line, and File2 is not written.
+            // File2's 1.0.0.0 minor decrement is a no-op — no
+            // "Changed ... to ...1.0.0.0" line, and File2 is not written.
             AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "to [assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
@@ -1102,8 +1097,8 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementPatchCommandWithDryrunWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
-            // Deliberate behaviour change (code review #4): a no-op decrement (patch already 0)
-            // no longer produces a "Would change ... 1.3.0 to 1.3.0" line. Dryrun never writes.
+            // A no-op decrement (patch already 0) no longer produces a
+            // "Would change ... 1.3.0 to 1.3.0" line. Dryrun never writes.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -1124,8 +1119,7 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithDecrementBuildCommandWithDryrunWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
-            // Deliberate behaviour change (code review #4): BUILD synonym, no-op — no
-            // "Would change" line.
+            // BUILD synonym, no-op — no "Would change" line.
 
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
@@ -1162,8 +1156,7 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
             AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement is a
-            // no-op — no "Would change ... to ...1.0.0.0" line.
+            // File2's 1.0.0.0 minor decrement is a no-op — no "Would change ... to ...1.0.0.0" line.
             AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "to [assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
@@ -1359,19 +1352,12 @@ namespace stampver.Tests
         }
         #endregion
 
-        #region Code review regression tests
         [TestCase("Patcher")]
         [TestCase("xmajor")]
         [TestCase("majorette")]
         [TestCase("build something")]
         public void CallingStampverWithVersionPartThatMerelyContainsAValidToken_OutputsErrorText(string versionPart)
         {
-            // Regression test for code review #1: the version-part validation regex was
-            // unanchored ("MAJOR|MINOR|PATCH|BUILD"), so any string CONTAINING one of those
-            // tokens passed, left VersionNumberPart at NotSet, and exited 0 having silently
-            // done nothing — the worst failure mode for a build-pipeline tool. Anchoring with
-            // ^...$ rejects these typos up front.
-
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", versionPart });
@@ -1390,11 +1376,6 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithFilePatternContainingInvalidCharacter_OutputsErrorText()
         {
-            // Regression test for code review #2: pattern validation no longer walks the
-            // filesystem; it cheaply rejects patterns containing characters invalid in a
-            // filename. '\0' (NUL) is invalid on every platform — on Linux CI the invalid-char
-            // set is just '\0' and '/', so '\0' keeps this portable.
-
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "bad\0pattern.cs" });
@@ -1411,10 +1392,6 @@ namespace stampver.Tests
         [Test]
         public void CallingStampverWithValidNonDefaultFilePattern_DoesNotErrorOnValidation()
         {
-            // Companion to code review #2: a character-valid pattern must pass validation even
-            // when it matches no files. The fake returns files only for "AssemblyInfo.cs", so
-            // "*.txt" enumerates empty — the run succeeds quietly with no validation error.
-
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "*.txt" });
@@ -1431,11 +1408,6 @@ namespace stampver.Tests
         [Test]
         public void CallingStampver_OnlyReplacesTheMatchedVersionNotOtherIdenticalSubstrings()
         {
-            // Regression test for code review #5: the old fileLine.Replace(old, new) rewrote
-            // EVERY occurrence of the version substring on a line, clobbering unrelated
-            // identical text (e.g. a trailing comment). The match-anchored splice rewrites only
-            // the matched attribute and leaves the rest of the line byte-for-byte.
-
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper(
                 files: new[] { "Custom.cs" },
@@ -1458,11 +1430,6 @@ namespace stampver.Tests
         [Test]
         public void CallingStampver_DoesNotTreatAVersionWithATrailingEmptyPartAsAMatch()
         {
-            // Regression test for code review #9: the AssemblyInfo regex previously allowed
-            // empty trailing parts (e.g. "1.2."). The tightened pattern rejects it, so a
-            // malformed attribute is left untouched while a well-formed one on the next line is
-            // still rewritten — proving the file is processed and only the valid line matches.
-
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper(
                 files: new[] { "Custom.cs" },
@@ -1482,6 +1449,5 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.\")]");
             AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
-        #endregion
     }
 }
