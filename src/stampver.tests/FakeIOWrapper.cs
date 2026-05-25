@@ -22,20 +22,31 @@ namespace stampver.Tests
         private readonly IReadOnlyList<string>? _customFiles;
         private readonly IReadOnlyDictionary<string, string>? _customFileContents;
 
+        // Pattern that custom files are returned for. Stampver now scans both
+        // "AssemblyInfo.cs" and "*.csproj" by default, so EnumerateFiles is
+        // called twice per run — without this, the same custom-file list would
+        // be returned for both calls and every file processed twice.
+        private readonly string _customFilesPattern;
+
         public FakeIOWrapper()
         {
             FileLinesOutput = new List<string>();
             StdOutputLines = new List<string>();
             StdErrorLines = new List<string>();
+            _customFilesPattern = "AssemblyInfo.cs";
         }
 
-        public FakeIOWrapper(IReadOnlyList<string> files, IReadOnlyDictionary<string, string> fileContents)
+        public FakeIOWrapper(
+            IReadOnlyList<string> files,
+            IReadOnlyDictionary<string, string> fileContents,
+            string filesPattern = "AssemblyInfo.cs")
         {
             FileLinesOutput = new List<string>();
             StdOutputLines = new List<string>();
             StdErrorLines = new List<string>();
             _customFiles = files;
             _customFileContents = fileContents;
+            _customFilesPattern = filesPattern;
         }
 
         public IEnumerable<string> EnumerateFiles(string fileToSearch)
@@ -46,12 +57,14 @@ namespace stampver.Tests
             }
             if (_customFiles != null)
             {
-                return _customFiles;
+                return fileToSearch == _customFilesPattern ? _customFiles : Array.Empty<string>();
             }
-            return new List<string>
-            {
-                "File1", "File2", "File3"
-            };
+            // Default fixture returns the canonical three files for the
+            // AssemblyInfo.cs pattern and nothing for any other pattern (e.g.
+            // the now-also-default "*.csproj" sweep).
+            return fileToSearch == "AssemblyInfo.cs"
+                ? new List<string> { "File1", "File2", "File3" }
+                : Array.Empty<string>();
         }
 
         public string[] ReadAllLinesFromFile(string file)
@@ -72,7 +85,7 @@ namespace stampver.Tests
         }
 
         private static string[] SplitLines(string text)
-            => text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            => text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
         private const string AssemblyInfoWithThreePartVersion = @"using System.Reflection;
 using System.Runtime.InteropServices;
