@@ -242,8 +242,14 @@ namespace stampver.Tests
 
         #region Decrement version number tests
         [Test]
-        public void CallingStampverWithDecrementPatchCommand_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWhenPatchAlreadyZero_MakesNoChangeAndReportsNothing()
         {
+            // Deliberate behaviour change (code review #4): the default fixtures all sit at
+            // patch 0, so decrementing patch is a no-op. A no-op must NOT be written back or
+            // reported (previously this test pinned the buggy behaviour where the unchanged
+            // version was still counted and the whole file rewritten). Real patch decrement
+            // is covered by CallingStampverWithDecrementPatchCommandWhenPatchIsNonZero_*.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch" });
@@ -253,16 +259,16 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommand_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWhenPatchAlreadyZero_MakesNoChangeAndReportsNothing()
         {
+            // Deliberate behaviour change (code review #4): BUILD is a synonym for PATCH and
+            // the fixtures sit at patch 0, so this is a no-op — nothing written or reported.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build" });
@@ -272,11 +278,57 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-           AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.0 (4 occurrences in 2 files)");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementPatchCommandWhenPatchIsNonZero_DecrementsPatch()
+        {
+            // Positive coverage added alongside code review #4: when patch is non-zero,
+            // decrement actually lowers it. The default fixtures can't show this (they sit
+            // at patch 0), so use a custom fixture at 1.3.5.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "Custom.cs" },
+                fileContents: new Dictionary<string, string>
+                {
+                    { "Custom.cs", "[assembly: AssemblyVersion(\"1.3.5\")]\n[assembly: AssemblyFileVersion(\"1.3.5\")]\n" },
+                });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.4 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.4\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"1.3.4\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDecrementBuildCommandWhenPatchIsNonZero_DecrementsPatch()
+        {
+            // Positive coverage that BUILD behaves as a synonym for PATCH on a real change.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "Custom.cs" },
+                fileContents: new Dictionary<string, string>
+                {
+                    { "Custom.cs", "[assembly: AssemblyVersion(\"1.3.5\")]\n[assembly: AssemblyFileVersion(\"1.3.5\")]\n" },
+                });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.4 (2 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.4\")]");
         }
 
         [Test]
@@ -292,10 +344,13 @@ namespace stampver.Tests
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            AssertContains(fakeIOWrapper.StdOutputLines, "1.0.0.0 (2 occurrences in 1 file)");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "1.2.0 (4 occurrences in 2 files)");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            // Deliberate behaviour change (code review #4): File2 sits at 1.0.0.0, so its
+            // minor part is already 0 — decrement there is a no-op and is no longer counted
+            // in the summary nor written back.
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "1.0.0.0 (");
+            AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -519,8 +574,12 @@ namespace stampver.Tests
 
         #region Decrement version number tests with quiet
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithQuiet_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithQuietWhenPatchAlreadyZero_MakesNoChange()
         {
+            // Deliberate behaviour change (code review #4): no-op decrement (patch already 0)
+            // writes nothing. Quiet already suppresses stdout; the point here is that no file
+            // is written either.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--quiet" });
@@ -531,13 +590,14 @@ namespace stampver.Tests
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithQuiet_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithQuietWhenPatchAlreadyZero_MakesNoChange()
         {
+            // Deliberate behaviour change (code review #4): BUILD synonym, no-op, nothing written.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--quiet" });
@@ -548,8 +608,7 @@ namespace stampver.Tests
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -565,8 +624,10 @@ namespace stampver.Tests
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
+            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement
+            // is a no-op, so that file is not written.
+            AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -766,8 +827,12 @@ namespace stampver.Tests
 
         #region Decrement version number tests with verbose
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithVerbose_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithVerboseWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
+            // Deliberate behaviour change (code review #4): a no-op decrement (patch already 0)
+            // is no longer logged as "Changed ... 1.3.0 to 1.3.0" and the file is not written.
+            // Verbose still logs which files were processed.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--verbose" });
@@ -777,22 +842,19 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "Changed");
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithVerbose_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithVerboseWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
+            // Deliberate behaviour change (code review #4): BUILD synonym, no-op — no "Changed"
+            // line and nothing written.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--verbose" });
@@ -802,16 +864,11 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.0\")]");
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "Changed");
         }
 
         [Test]
@@ -827,15 +884,16 @@ namespace stampver.Tests
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
             Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
-            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
             AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
             AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Changed (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement is a
+            // no-op — no "Changed ... to ...1.0.0.0" line, and File2 is not written.
+            AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.0.0.0\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "to [assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -1042,8 +1100,11 @@ namespace stampver.Tests
 
         #region Decrement version number tests with dryrun
         [Test]
-        public void CallingStampverWithDecrementPatchCommandWithDryrun_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementPatchCommandWithDryrunWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
+            // Deliberate behaviour change (code review #4): a no-op decrement (patch already 0)
+            // no longer produces a "Would change ... 1.3.0 to 1.3.0" line. Dryrun never writes.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch", "--dryrun" });
@@ -1053,20 +1114,19 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "Would change");
         }
 
         [Test]
-        public void CallingStampverWithDecrementBuildCommandWithDryrun_DecrementsAndOutputsNewVersion()
+        public void CallingStampverWithDecrementBuildCommandWithDryrunWhenPatchAlreadyZero_LogsProcessingButNoChange()
         {
+            // Deliberate behaviour change (code review #4): BUILD synonym, no-op — no
+            // "Would change" line.
+
             // Arrange
             var fakeIOWrapper = new FakeIOWrapper();
             var sut = new Stampver(fakeIOWrapper, new[] { "-d", "build", "--dryrun" });
@@ -1076,15 +1136,11 @@ namespace stampver.Tests
 
             // Assert
             Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
-            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.GreaterThan(0));
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File1");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File2");
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.3.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "Would change");
         }
 
         [Test]
@@ -1106,8 +1162,9 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "Processing file: File3");
             AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 36): [assembly: AssemblyVersion(\"1.3.0\")] to [assembly: AssemblyVersion(\"1.2.0\")]");
             AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 37): [assembly: AssemblyFileVersion(\"1.3.0\")] to [assembly: AssemblyFileVersion(\"1.2.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 34): [assembly: AssemblyVersion(\"1.0.0.0\")] to [assembly: AssemblyVersion(\"1.0.0.0\")]");
-            AssertContains(fakeIOWrapper.StdOutputLines, "Would change (Line 35): [assembly: AssemblyFileVersion(\"1.0.0.0\")] to [assembly: AssemblyFileVersion(\"1.0.0.0\")]");
+            // Deliberate behaviour change (code review #4): File2's 1.0.0.0 minor decrement is a
+            // no-op — no "Would change ... to ...1.0.0.0" line.
+            AssertDoesNotContain(fakeIOWrapper.StdOutputLines, "to [assembly: AssemblyVersion(\"1.0.0.0\")]");
         }
 
         [Test]
@@ -1299,6 +1356,131 @@ namespace stampver.Tests
             Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
             AssertContains(fakeIOWrapper.StdErrorLines, "stampver: unexpected error: simulated permission denied");
             AssertDoesNotContain(fakeIOWrapper.StdErrorLines, "at stampver.");
+        }
+        #endregion
+
+        #region Code review regression tests
+        [TestCase("Patcher")]
+        [TestCase("xmajor")]
+        [TestCase("majorette")]
+        [TestCase("build something")]
+        public void CallingStampverWithVersionPartThatMerelyContainsAValidToken_OutputsErrorText(string versionPart)
+        {
+            // Regression test for code review #1: the version-part validation regex was
+            // unanchored ("MAJOR|MINOR|PATCH|BUILD"), so any string CONTAINING one of those
+            // tokens passed, left VersionNumberPart at NotSet, and exited 0 having silently
+            // done nothing — the worst failure mode for a build-pipeline tool. Anchoring with
+            // ^...$ rejects these typos up front.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", versionPart });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid version number part specified");
+        }
+
+        [Test]
+        public void CallingStampverWithFilePatternContainingInvalidCharacter_OutputsErrorText()
+        {
+            // Regression test for code review #2: pattern validation no longer walks the
+            // filesystem; it cheaply rejects patterns containing characters invalid in a
+            // filename. '\0' (NUL) is invalid on every platform — on Linux CI the invalid-char
+            // set is just '\0' and '/', so '\0' keeps this portable.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "bad\0pattern.cs" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid file pattern specified");
+        }
+
+        [Test]
+        public void CallingStampverWithValidNonDefaultFilePattern_DoesNotErrorOnValidation()
+        {
+            // Companion to code review #2: a character-valid pattern must pass validation even
+            // when it matches no files. The fake returns files only for "AssemblyInfo.cs", so
+            // "*.txt" enumerates empty — the run succeeds quietly with no validation error.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "*.txt" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            Assert.That(fakeIOWrapper.StdErrorLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CallingStampver_OnlyReplacesTheMatchedVersionNotOtherIdenticalSubstrings()
+        {
+            // Regression test for code review #5: the old fileLine.Replace(old, new) rewrote
+            // EVERY occurrence of the version substring on a line, clobbering unrelated
+            // identical text (e.g. a trailing comment). The match-anchored splice rewrites only
+            // the matched attribute and leaves the rest of the line byte-for-byte.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "Custom.cs" },
+                fileContents: new Dictionary<string, string>
+                {
+                    { "Custom.cs", "[assembly: AssemblyVersion(\"1.3.5\")] // previously 1.3.5\n" },
+                });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-d", "patch" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.3.4 (1 occurrence in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.4\")] // previously 1.3.5");
+            AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "previously 1.3.4");
+        }
+
+        [Test]
+        public void CallingStampver_DoesNotTreatAVersionWithATrailingEmptyPartAsAMatch()
+        {
+            // Regression test for code review #9: the AssemblyInfo regex previously allowed
+            // empty trailing parts (e.g. "1.2."). The tightened pattern rejects it, so a
+            // malformed attribute is left untouched while a well-formed one on the next line is
+            // still rewritten — proving the file is processed and only the valid line matches.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "Custom.cs" },
+                fileContents: new Dictionary<string, string>
+                {
+                    { "Custom.cs", "[assembly: AssemblyVersion(\"1.2.\")]\n[assembly: AssemblyFileVersion(\"2.0.0\")]\n" },
+                });
+            var sut = new Stampver(fakeIOWrapper, new[] { "-e", "5.6.7" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            // The valid FileVersion was rewritten; the malformed "1.2." was not matched.
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyFileVersion(\"5.6.7\")]");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.\")]");
+            AssertDoesNotContain(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"5.6.7\")]");
         }
         #endregion
     }

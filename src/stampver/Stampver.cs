@@ -26,7 +26,7 @@ namespace stampver
         private static readonly FileFormat AssemblyInfoFormat = new()
         {
             VersionPattern = new Regex(
-                @"Assembly(?:|File)Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*|)(?:\.|)(?:\d{1,5}|\*|))""\)",
+                @"Assembly(?:File)?Version\(""(?<version>\d{1,5}\.\d{1,5}\.(?:\d{1,5}|\*)(?:\.(?:\d{1,5}|\*))?)""\)",
                 RegexOptions.Compiled | RegexOptions.CultureInvariant),
             CommentMarker = "//",
             DefaultFilePattern = "AssemblyInfo.cs",
@@ -98,7 +98,7 @@ namespace stampver
                 {"quiet", "do not output anything to the console", _ => args.SetQuiet() },
                 {"verbose", "output verbose information to the console", _ => args.SetVerbose() },
                 {"dryrun", "perform a dry run and don't update any files", _ => args.SetDryrun() },
-                {"help", "command to increment the version number", _ => args.SetDisplayHelp() }
+                {"help", "display this help text", _ => args.SetDisplayHelp() }
             };
 
             try
@@ -242,7 +242,25 @@ namespace stampver
                 }
                 replacedVersionNumber = originalAssemblyVersion.GetVersionString();
             }
-            var newFileLine = fileLine.Replace(originalVersionNumber, replacedVersionNumber);
+            // Splice the replacement in at the matched group's position rather than
+            // using fileLine.Replace, which would rewrite every occurrence of the
+            // version substring on the line (a line may legitimately contain two
+            // version elements) and could clobber an unrelated identical substring.
+            var versionGroup = match.Groups["version"];
+            var newFileLine = string.Concat(
+                fileLine.AsSpan(0, versionGroup.Index),
+                replacedVersionNumber,
+                fileLine.AsSpan(versionGroup.Index + versionGroup.Length));
+
+            // A no-op (e.g. decrementing a part already at 0, or an explicit set to the
+            // current value) must not be reported or written: leave the line untouched
+            // so we don't produce "Changed 1.3.0 to 1.3.0", count a phantom occurrence,
+            // or rewrite the whole file for a command that changed nothing.
+            if (string.Equals(newFileLine, fileLine, StringComparison.Ordinal))
+            {
+                return new ProcessedLineResult(fileLine, false, null);
+            }
+
             var prefix = versionArgs.IsDryrun ? "Would Change" : "Changed";
             LogIfVerbose($"{prefix} (Line {fileLineNumber}): {fileLine} to {newFileLine}", versionArgs);
             return new ProcessedLineResult(newFileLine, true, replacedVersionNumber);

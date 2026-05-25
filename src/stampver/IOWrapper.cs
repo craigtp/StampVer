@@ -33,7 +33,20 @@ namespace stampver
                 // Preserve the original encoding (including any BOM) so we don't silently
                 // change the file's byte preamble on first write.
                 var originalEncoding = DetectEncoding(file);
-                File.WriteAllLines(tempFileName, fileLines, originalEncoding);
+
+                // Preserve the original newline style and trailing-newline state too.
+                // ReadAllLinesFromFile strips line endings, so re-joining with
+                // File.WriteAllLines would force Environment.NewLine (rewriting an LF
+                // file as CRLF on Windows) and always append a trailing newline. We
+                // only touch one or two version lines, so the rest of the file — line
+                // endings included — must come back out byte-for-byte.
+                var (newline, hadTrailingNewline) = DetectNewlineStyle(file);
+                var body = string.Join(newline, fileLines);
+                if (hadTrailingNewline)
+                {
+                    body += newline;
+                }
+                File.WriteAllText(tempFileName, body, originalEncoding);
 
                 if (File.Exists(file))
                 {
@@ -71,6 +84,44 @@ namespace stampver
             using var reader = new StreamReader(file, fallback, detectEncodingFromByteOrderMarks: true);
             _ = reader.Peek();
             return reader.CurrentEncoding;
+        }
+
+        // Returns the file's newline style (first one encountered wins, matching the
+        // "join everything with one style" approach) and whether the file ended with a
+        // trailing newline. An empty file, or one with no newline at all, reports the
+        // platform default and no trailing newline (so a no-newline file stays that way).
+        private static (string Newline, bool HadTrailingNewline) DetectNewlineStyle(string file)
+        {
+            using var reader = new StreamReader(file);
+            string? newline = null;
+            var lastWasNewline = false;
+            int ch;
+            while ((ch = reader.Read()) != -1)
+            {
+                if (ch == '\r')
+                {
+                    // Decide pairing from the actual next char, not the stored style,
+                    // so a bare '\r' in an otherwise CRLF file doesn't swallow the
+                    // following character.
+                    var pairedWithLf = reader.Peek() == '\n';
+                    if (pairedWithLf)
+                    {
+                        reader.Read(); // consume the paired '\n'
+                    }
+                    newline ??= pairedWithLf ? "\r\n" : "\r";
+                    lastWasNewline = true;
+                }
+                else if (ch == '\n')
+                {
+                    newline ??= "\n";
+                    lastWasNewline = true;
+                }
+                else
+                {
+                    lastWasNewline = false;
+                }
+            }
+            return (newline ?? Environment.NewLine, lastWasNewline);
         }
 
         private static void TryDelete(string path)

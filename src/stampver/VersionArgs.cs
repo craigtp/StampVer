@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using stampver.Options;
 
@@ -59,15 +61,13 @@ namespace stampver
             {
                 throw new OptionException("Invalid version number specified", "-e");
             }
-            var versionNumbers = versionNumber.Split('.');
-            foreach (var number in versionNumbers)
+            // The regex already guarantees three 1-5 digit numeric parts, so the only
+            // remaining check is the per-part upper bound. ushort.TryParse rejects
+            // anything above ushort.MaxValue (65535) in a single call; NumberStyles.None
+            // keeps it strict (the regex has already excluded signs/whitespace anyway).
+            foreach (var part in versionNumber.Split('.'))
             {
-                int versionNumberInteger;
-                if (!int.TryParse(number, out versionNumberInteger))
-                {
-                    throw new OptionException("Invalid version number specified", "-e");
-                }
-                if (versionNumberInteger < 0 || versionNumberInteger > 65535)
+                if (!ushort.TryParse(part, NumberStyles.None, CultureInfo.InvariantCulture, out _))
                 {
                     throw new OptionException("Invalid version number specified", "-e");
                 }
@@ -105,47 +105,52 @@ namespace stampver
                 OutputType = OutputType.Normal;
             }
 
-            // Validate the pattern eagerly without forcing a full filesystem walk.
-            try
-            {
-                // Triggers ArgumentException for invalid characters in the pattern itself.
-                _ = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), FilePattern));
-
-                // Force at least one MoveNext() so EnumerateFiles validates its inputs.
-                using var enumerator = Directory
-                    .EnumerateFiles(Directory.GetCurrentDirectory(), FilePattern, SearchOption.AllDirectories)
-                    .GetEnumerator();
-                enumerator.MoveNext();
-            }
-            catch (ArgumentException)
+            // Reject patterns containing characters Directory.EnumerateFiles forbids,
+            // without touching the filesystem. The real enumeration runs behind
+            // IIOWrapper and surfaces any genuine filesystem errors at processing time,
+            // so validating here keeps VersionArgs a pure intent object (no disk walk).
+            if (!string.IsNullOrEmpty(FilePattern) && FilePattern.IndexOfAny(InvalidPatternChars) >= 0)
             {
                 throw new OptionException("Invalid file pattern specified!", string.Empty);
             }
         }
 
+        // Characters Directory.EnumerateFiles rejects in a search pattern. The two
+        // wildcard characters '*' and '?' are explicitly allowed through. Note this
+        // set is platform-dependent: on Windows it includes '<', '>', '|', ':' etc.;
+        // on Unix it is just '\0' and '/'. '\0' is invalid on every platform.
+        private static readonly char[] InvalidPatternChars =
+            Path.GetInvalidFileNameChars().Where(c => c is not ('*' or '?')).ToArray();
+
         #region Private Helper Methods
         private void SetVersionNumberPart(string versionPart)
         {
-            switch (versionPart.ToLowerInvariant())
+            // Total mapping: the default arm means an unmatched value can never be
+            // silently accepted (which previously left VersionNumberPart at NotSet,
+            // turning a typo into a no-op success). The anchored regex already guards
+            // this, but keeping the switch total is cheap defence-in-depth.
+            VersionNumberPart = versionPart.ToLowerInvariant() switch
             {
-                case "major":
-                    VersionNumberPart = VersionNumberPart.Major;
-                    break;
-                case "minor":
-                    VersionNumberPart = VersionNumberPart.Minor;
-                    break;
-                case "patch":
-                case "build":
-                    VersionNumberPart = VersionNumberPart.Patch;
-                    break;
-            }
+                "major" => VersionNumberPart.Major,
+                "minor" => VersionNumberPart.Minor,
+                "patch" or "build" => VersionNumberPart.Patch,
+                _ => throw new OptionException("Invalid version number part specified", string.Empty),
+            };
         }
+
+        // Anchored so substrings can't slip through — without ^...$, values like
+        // "Patcher", "xmajor" or "build something" would match an embedded token and
+        // be silently accepted, then no-op downstream (AssemblyVersion.Adjust maps
+        // an unset part to index -1 and returns). Mirrors the anchoring fix for -e.
+        private static readonly Regex VersionPartRegex = new(
+            @"^(?:MAJOR|MINOR|PATCH|BUILD)$",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         private static void AssertVersionNumberPartIsValid(string versionPart)
         {
             ArgumentNullException.ThrowIfNull(versionPart);
 
-            if (!Regex.IsMatch(versionPart, @"MAJOR|MINOR|PATCH|BUILD", RegexOptions.IgnoreCase))
+            if (!VersionPartRegex.IsMatch(versionPart))
             {
                 throw new OptionException("Invalid version number part specified", string.Empty);
             }
