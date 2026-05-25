@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NDesk.Options;
+using stampver.Options;
 using NUnit.Framework;
 
 namespace stampver.Tests.Options

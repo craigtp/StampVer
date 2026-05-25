@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using NDesk.Options;
+using stampver.Options;
 
 namespace stampver
 {

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using NDesk.Options;
 using NUnit.Framework;
+using stampver.Options;
 
 namespace stampver.Tests.Options
 {
@@ -196,14 +196,18 @@ namespace stampver.Tests.Options
         }
 
         [Test]
-        public void WriteOptionDescriptions_StrayCloseBraceInDescription_Throws()
+        public void WriteOptionDescriptions_StrayCloseBraceInDescription_ThrowsFormatExceptionIdentifyingTheOption()
         {
-            // QUIRK: a single unbalanced "}" trips an InvalidOperationException
-            // from GetDescription. Pin so the refactor decides whether this
-            // panic-on-malformed-description behaviour stays.
+            // Phase 0 modernisation: an unbalanced "}" still aborts rendering,
+            // but the exception type is now FormatException (the BCL-standard
+            // choice for malformed input) and the message identifies which
+            // option's description is broken — much easier to diagnose than
+            // the original InvalidOperationException with a generic message.
             var set = new OptionSet { { "a", "broken } description", _ => { } } };
 
-            Assert.Throws<InvalidOperationException>(() => Render(set));
+            var ex = Assert.Throws<FormatException>(() => Render(set))!;
+            Assert.That(ex.Message, Does.Contain("'a'"),
+                "the message should identify the offending option by prototype.");
         }
 
         #endregion
@@ -251,13 +255,13 @@ namespace stampver.Tests.Options
         #region Localizer integration
 
         [Test]
-        public void WriteOptionDescriptions_LocalizerWrapsBracketAndEqualsTokensIndependentlyOfTheName()
+        public void WriteOptionDescriptions_LocalizerWrapsTheEntireValueTailAsOneFragment()
         {
-            // QUIRK worth knowing: WriteOptionPrototype runs the localizer on
-            // "[", "]", and "=VALUE" SEPARATELY but NOT on the option name
-            // itself. A localizer used as a poor-man's debug tracer would see
-            // each piece individually. Pin so the refactor either keeps the
-            // structure or documents a deliberate consolidation.
+            // Phase 0 modernisation: the value-tail "[=VALUE]" is built once
+            // and passed through the localizer as a single string, instead of
+            // the original NDesk approach of three separate localizer calls
+            // ("[", "=VALUE", "]"). A custom localizer can now translate the
+            // construct as a unit — which is what callers actually want.
             var localized = new OptionSet(s => $"<{s}>")
             {
                 { "name:", "wrapped", _ => { } },
@@ -265,12 +269,8 @@ namespace stampver.Tests.Options
 
             var output = Render(localized);
 
-            Assert.That(output, Does.Contain("<[>"),
-                "the '[' marker is wrapped by the localizer in isolation.");
-            Assert.That(output, Does.Contain("<=VALUE>"),
-                "the '=VALUE' fragment is wrapped by the localizer in isolation.");
-            Assert.That(output, Does.Contain("<]>"),
-                "the ']' marker is wrapped by the localizer in isolation.");
+            Assert.That(output, Does.Contain("<[=VALUE]>"),
+                "the bracketed value tail is wrapped by the localizer in one piece.");
             Assert.That(output, Does.Contain("--name"),
                 "the option name itself is NOT routed through the localizer.");
         }
@@ -281,9 +281,9 @@ namespace stampver.Tests.Options
         // separator-display path with explicit prototypes.
         private sealed class TwoValueOption : Option
         {
-            private readonly OptionAction<string, string> _action;
+            private readonly Action<string, string> _action;
 
-            public TwoValueOption(string prototype, OptionAction<string, string> action, string description)
+            public TwoValueOption(string prototype, Action<string, string> action, string description)
                 : base(prototype, description, 2)
             {
                 _action = action;

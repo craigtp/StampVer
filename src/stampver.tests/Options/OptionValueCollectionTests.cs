@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NDesk.Options;
+using stampver.Options;
 using NUnit.Framework;
 
 namespace stampver.Tests.Options

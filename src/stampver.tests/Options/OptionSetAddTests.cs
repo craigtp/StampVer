@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using NDesk.Options;
 using NUnit.Framework;
+using stampver.Options;
 
 namespace stampver.Tests.Options
 {
@@ -29,7 +29,7 @@ namespace stampver.Tests.Options
         [Test]
         public void CustomLocalizerConstructor_ExposesTheSameDelegateInstance()
         {
-            Converter<string, string> localizer = s => $"[{s}]";
+            Func<string, string> localizer = s => $"[{s}]";
 
             var set = new OptionSet(localizer);
 
@@ -155,7 +155,7 @@ namespace stampver.Tests.Options
         {
             var set = new OptionSet();
 
-            Assert.Throws<ArgumentNullException>(() => set.Add("p=", (OptionAction<string, string>)null!));
+            Assert.Throws<ArgumentNullException>(() => set.Add("p=", (Action<string, string>)null!));
         }
 
         [Test]
@@ -222,25 +222,37 @@ namespace stampver.Tests.Options
 
         #endregion
 
-        #region Cross-culture quirk pinning
+        #region Locale-independent typed conversion
 
         [Test]
-        [SetCulture("tr-TR")]
-        public void AddTypedAction_DoubleConversion_UsesCurrentCultureForParsing()
+        public void AddTypedAction_DoubleConversion_UsesInvariantCultureRegardlessOfDefaultLocale()
         {
-            // QUIRK: Parse<T> calls TypeConverter.ConvertFromString without an
-            // explicit CultureInfo, which defaults to CultureInfo.CurrentCulture.
-            // In tr-TR the decimal separator is ',', so "1,5" parses as 1.5.
-            // In invariant culture the same input would either fail or be
-            // mis-parsed. The modernised parser should make this an explicit
-            // choice (most likely InvariantCulture) — pinning the current
-            // locale-coupled behaviour so the swap is visible.
+            // Phase 0 modernisation: Parse<T> now passes CultureInfo.InvariantCulture
+            // explicitly to TypeConverter.ConvertFromString. The original NDesk
+            // implementation defaulted to CurrentCulture and so silently produced
+            // different parse results depending on the user's locale. Invariant
+            // is the correct default for parsing command-line arguments.
             double captured = 0;
             var set = new OptionSet { { "ratio=", (double v) => captured = v } };
 
-            set.Parse(new[] { "--ratio=1,5" });
+            set.Parse(new[] { "--ratio=1.5" });
 
             Assert.That(captured, Is.EqualTo(1.5));
+        }
+
+        [Test]
+        [SetCulture("tr-TR")]
+        public void AddTypedAction_DoubleConversion_TurkishCommaDecimalIsRejectedUnderInvariantParsing()
+        {
+            // Companion to the test above: under tr-TR, the decimal separator
+            // is ',', and the original NDesk parser accepted "1,5". The Phase 0
+            // switch to InvariantCulture means "1,5" no longer parses as 1.5
+            // and surfaces a normal conversion failure. Pinning the new shape.
+            var set = new OptionSet { { "ratio=", (double _) => { } } };
+
+            var ex = Assert.Throws<OptionException>(() => set.Parse(new[] { "--ratio=1,5" }))!;
+            Assert.That(ex.Message, Does.Contain("Could not convert"));
+            Assert.That(ex.OptionName, Is.EqualTo("--ratio"));
         }
 
         #endregion
@@ -258,29 +270,32 @@ namespace stampver.Tests.Options
         }
 
         [Test]
-        public void Remove_OnSoleOptionInSet_ThrowsArgumentOutOfRangeException_KnownBug()
+        public void Remove_OnSoleOptionInSet_RemovesAllAliasesCleanly()
         {
-            // KNOWN BUG. OptionSet.RemoveItem(index) calls base.RemoveItem(index)
-            // FIRST and then dereferences Items[index] to find the alias names —
-            // but the item has already been removed, so Items[index] is either
-            // out of range (this case) or the wrong option (test below).
-            // Pinning the current observable behaviour so the modernisation
-            // refactor surfaces an explicit fix (capture names BEFORE removal).
+            // Phase 0 bug fix: the original NDesk implementation captured alias
+            // names AFTER calling base.RemoveItem, dereferencing already-removed
+            // storage and either throwing AOORE (this case) or reading a stale
+            // item (the multi-option case below). The modernised Remove captures
+            // names BEFORE removing — all aliases now disappear cleanly.
             var set = new OptionSet { { "h|?|help", _ => { } } };
             var option = set["h"];
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => set.Remove(option));
+            var removed = set.Remove(option);
+
+            Assert.That(removed, Is.True);
+            Assert.That(set.Count, Is.EqualTo(0));
+            Assert.That(set.Contains("h"), Is.False);
+            Assert.That(set.Contains("?"), Is.False);
+            Assert.That(set.Contains("help"), Is.False);
         }
 
         [Test]
-        public void Remove_OptionWithAliasesAndTrailingItem_LeavesStaleAliasEntries_KnownBug()
+        public void Remove_OptionWithAliasesAndTrailingItem_RemovesAllAliasesAndLeavesOtherOptionIntact()
         {
-            // Continuation of the bug pinned above: when a following option
-            // exists, RemoveItem reads its Names instead of the removed option's,
-            // so the original option's alias entries stay live in the lookup
-            // dictionary. KeyedCollection still removes the FIRST name correctly
-            // because that path runs inside base.RemoveItem before the broken
-            // post-call dereference.
+            // Companion to the test above. The original implementation left
+            // stale alias entries ("?" and "help") in the lookup when there was
+            // a trailing item, because it read the WRONG option's names after
+            // the base removal had already shifted indices. Fixed in Phase 0.
             var set = new OptionSet
             {
                 { "h|?|help", _ => { } },
@@ -290,17 +305,15 @@ namespace stampver.Tests.Options
 
             set.Remove(helpOption);
 
-            Assert.That(set.Contains("h"), Is.False, "first name is correctly removed by base.RemoveItem.");
-            Assert.That(set.Contains("?"), Is.True, "stale alias — refactor target.");
-            Assert.That(set.Contains("help"), Is.True, "stale alias — refactor target.");
+            Assert.That(set.Contains("h"), Is.False);
+            Assert.That(set.Contains("?"), Is.False, "all aliases of a removed option must also be removed.");
+            Assert.That(set.Contains("help"), Is.False, "all aliases of a removed option must also be removed.");
+            Assert.That(set.Contains("v"), Is.True, "untouched option must remain registered.");
         }
 
         [Test]
         public void Remove_AliaslessOptionWithTrailingItem_RemovesCleanly()
         {
-            // Sanity check: when the removed option has no aliases, the buggy
-            // post-removal dereference walks an empty loop body, so the dictionary
-            // ends up consistent. This is the only Remove path that currently works.
             var set = new OptionSet
             {
                 { "first", _ => { } },
@@ -315,15 +328,31 @@ namespace stampver.Tests.Options
         }
 
         [Test]
-        public void Add_DuplicateAliasAcrossOptions_Throws()
+        public void Remove_OnOptionNotInSet_ReturnsFalseWithoutThrowing()
         {
+            // Modernised Remove returns bool (matching the BCL convention for
+            // ICollection<T>.Remove and Dictionary.Remove). The original code
+            // had no graceful path for "option not present" — pinning the new
+            // contract so callers know they can probe-then-remove safely.
+            var set = new OptionSet { { "a", _ => { } } };
+            var orphan = set["a"];
+            set.Remove(orphan);
+
+            Assert.That(set.Remove(orphan), Is.False);
+        }
+
+        [Test]
+        public void Add_DuplicateAliasAcrossOptions_ThrowsArgumentExceptionIdentifyingTheConflictingName()
+        {
+            // Phase 0 modernisation: alias collisions throw a specific
+            // ArgumentException whose message contains the conflicting alias.
+            // The original NDesk code threw "something" (the test had to use
+            // Throws.Exception). Tightening lets callers actually diagnose.
             var set = new OptionSet { { "name=", _ => { } } };
 
-            // Pin: alias collisions are surfaced eagerly, not lazily at parse time.
-            // The exact exception type isn't documented — pinning that *something*
-            // throws so the modernised implementation has a freedom-versus-contract
-            // checkpoint here.
-            Assert.That(() => set.Add("name=", _ => { }), Throws.Exception);
+            var ex = Assert.Throws<ArgumentException>(() => set.Add("name=", _ => { }))!;
+            Assert.That(ex.Message, Does.Contain("'name'"),
+                "the diagnostic should identify the conflicting alias.");
         }
 
         [Test]

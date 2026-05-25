@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NDesk.Options;
+using stampver.Options;
 using NUnit.Framework;
 
 namespace stampver.Tests.Options
@@ -443,9 +443,9 @@ namespace stampver.Tests.Options
         // separator (the higher-level Add overloads don't expose this knob).
         private sealed class TwoValueOption : Option
         {
-            private readonly OptionAction<string, string> _action;
+            private readonly Action<string, string> _action;
 
-            public TwoValueOption(string prototype, OptionAction<string, string> action)
+            public TwoValueOption(string prototype, Action<string, string> action)
                 : base(prototype, null!, 2)
             {
                 _action = action;
