@@ -1,1 +1,1 @@
-dotnet publish -c Release -r win-x64 --self-contained
+dotnet publish .\src\stampver.sln -c Release -r win-x64 --self-contained
