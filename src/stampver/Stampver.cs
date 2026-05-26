@@ -73,6 +73,16 @@ namespace stampver
                 return ExitCodes.Success;
             }
 
+            // A non-existent --dir is a user error, not an internal fault: surface it as a
+            // clean usage error on stderr rather than letting Directory.EnumerateFiles throw
+            // a raw DirectoryNotFoundException into the top-level catch-all. An empty
+            // StartDirectory (the default) denotes the current directory and always passes.
+            if (!ioWrapper.DirectoryExists(versionArgs.StartDirectory))
+            {
+                ioWrapper.WriteToStdErr($"error: starting directory not found: '{versionArgs.StartDirectory}'");
+                return ExitCodes.UsageError;
+            }
+
             var updatedVersionNumbers = ProcessFiles(versionArgs);
 
             if (versionArgs.OutputType == OutputType.Normal)
@@ -95,6 +105,7 @@ namespace stampver
                 {"i=", "command to increment the version number", v => args.SetIncrement(v) },
                 {"d=", "command to decrement the version number", v => args.SetDecrement(v) },
                 {"e=", "command to explicitly set the complete version number", v => args.SetExplicit(v) },
+                {"dir|directory=", "directory to start searching from (defaults to the current directory)", v => args.SetStartDirectory(v) },
                 {"quiet", "do not output anything to the console", _ => args.SetQuiet() },
                 {"verbose", "output verbose information to the console", _ => args.SetVerbose() },
                 {"dryrun", "perform a dry run and don't update any files", _ => args.SetDryrun() },
@@ -142,7 +153,7 @@ namespace stampver
             var updatedVersionNumbers = new List<VersionUpdate>();
             foreach (var pattern in patterns)
             {
-                foreach (var file in ioWrapper.EnumerateFiles(pattern))
+                foreach (var file in ioWrapper.EnumerateFiles(versionArgs.StartDirectory, pattern))
                 {
                     ProcessSingleFile(file, versionArgs, updatedVersionNumbers);
                 }
@@ -297,7 +308,7 @@ version number or can explicitly set the entire version string.
 Usage
 -----
 stampver.exe [command] [version part or specific version number]
-             [(optional) filepattern]
+             [--dir directory] [(optional) filepattern]
 
 where:
 
@@ -322,6 +333,9 @@ only usable with the -i or -d commands.  Attempting to use commands and version
 parameters that are incompatible will cause the program to display an error.
 
 Additional commands that can be specified are as follows:
+--dir        = The directory to start searching from. When omitted, the search
+  (--directory) starts from the current working directory. The search is always
+               recursive through all subdirectories of the starting directory.
 --quiet      = Don't write out anything to the console.
 --verbose    = Display full logging information of the files and changes made
                to the console.

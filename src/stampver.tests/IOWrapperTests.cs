@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -7,9 +8,11 @@ namespace stampver.Tests
 {
     // Exercises the REAL IoWrapper against a temporary directory. This is the only
     // fixture that touches disk — it has to, because newline/encoding preservation
-    // is a property of the real filesystem writer, which the FakeIOWrapper
-    // deliberately does not model. Each test cleans up after itself.
+    // and directory enumeration are properties of the real filesystem, which the
+    // FakeIOWrapper deliberately does not model. Each test cleans up after itself.
+    // Marked NonParallelizable because one test mutates the process working directory.
     [TestFixture]
+    [NonParallelizable]
     internal sealed class IOWrapperTests
     {
         private string _tempDir = string.Empty;
@@ -87,6 +90,66 @@ namespace stampver.Tests
             Assert.That(bytes[1], Is.EqualTo(0xBB));
             Assert.That(bytes[2], Is.EqualTo(0xBF));
             Assert.That(File.ReadAllText(file), Is.EqualTo("CHANGED\r\nline2\r\n"));
+        }
+
+        [Test]
+        public void EnumerateFiles_WithExplicitDirectory_FindsFilesRecursively()
+        {
+            // Arrange: a file at the top level and one in a subdirectory. The --dir feature
+            // must honour the given directory AND keep recursing into subdirectories.
+            var topFile = Path.Combine(_tempDir, "A.cs");
+            var subDir = Path.Combine(_tempDir, "sub");
+            Directory.CreateDirectory(subDir);
+            var nestedFile = Path.Combine(subDir, "B.cs");
+            File.WriteAllText(topFile, "// top");
+            File.WriteAllText(nestedFile, "// nested");
+            var sut = new IoWrapper();
+
+            // Act
+            var found = sut.EnumerateFiles(_tempDir, "*.cs").ToList();
+
+            // Assert
+            Assert.That(found, Has.Count.EqualTo(2));
+            Assert.That(found, Has.Member(topFile));
+            Assert.That(found, Has.Member(nestedFile));
+        }
+
+        [Test]
+        public void EnumerateFiles_WithEmptyDirectory_FallsBackToCurrentDirectory()
+        {
+            // Arrange: an empty start directory must resolve to the current working directory,
+            // preserving the pre-feature behaviour. Point the CWD at our temp dir for the test.
+            var file = Path.Combine(_tempDir, "C.cs");
+            File.WriteAllText(file, "// current dir");
+            var originalCurrentDirectory = Directory.GetCurrentDirectory();
+            var sut = new IoWrapper();
+
+            try
+            {
+                Directory.SetCurrentDirectory(_tempDir);
+
+                // Act
+                var found = sut.EnumerateFiles(string.Empty, "*.cs").ToList();
+
+                // Assert: the file in the (now-current) temp dir is found.
+                Assert.That(found, Has.Count.EqualTo(1));
+                Assert.That(Path.GetFileName(found[0]), Is.EqualTo("C.cs"));
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalCurrentDirectory);
+            }
+        }
+
+        [Test]
+        public void DirectoryExists_TrueForExisting_FalseForMissing_TrueForEmpty()
+        {
+            var sut = new IoWrapper();
+
+            Assert.That(sut.DirectoryExists(_tempDir), Is.True);
+            Assert.That(sut.DirectoryExists(Path.Combine(_tempDir, "does-not-exist")), Is.False);
+            // Empty denotes the current directory, which always exists.
+            Assert.That(sut.DirectoryExists(string.Empty), Is.True);
         }
     }
 }

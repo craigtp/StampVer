@@ -15,6 +15,10 @@ namespace stampver
         public bool DisplayHelp { get; private set; }
         public OutputType OutputType { get; private set; } = OutputType.NotSet;
         public string FilePattern { get; private set; } = string.Empty;
+        // The directory to start the recursive file search from. Empty means
+        // "the current working directory" — the disk-level default is resolved
+        // inside IoWrapper so this object stays a pure intent object (no disk walk).
+        public string StartDirectory { get; private set; } = string.Empty;
         public bool IsDryrun { get; private set; }
 
         public void SetDisplayHelp()
@@ -30,6 +34,11 @@ namespace stampver
         public void SetFilePattern(string filePattern)
         {
             FilePattern = filePattern;
+        }
+
+        public void SetStartDirectory(string startDirectory)
+        {
+            StartDirectory = startDirectory;
         }
 
         public void SetIncrement(string versionPart)
@@ -113,6 +122,17 @@ namespace stampver
             {
                 throw new OptionException("Invalid file pattern specified!", string.Empty);
             }
+
+            // Same rationale for the start directory: reject characters that can never
+            // appear in a valid path (e.g. '\0') without touching the filesystem. Whether
+            // the directory actually exists is checked at processing time behind IIOWrapper,
+            // so this stays a pure intent object. Note we use GetInvalidPathChars (not
+            // GetInvalidFileNameChars) so legitimate path characters like '\', '/' and ':'
+            // in "C:\MyRepo" are not rejected.
+            if (!string.IsNullOrEmpty(StartDirectory) && StartDirectory.IndexOfAny(InvalidPathChars) >= 0)
+            {
+                throw new OptionException("Invalid directory specified!", string.Empty);
+            }
         }
 
         // Characters Directory.EnumerateFiles rejects in a search pattern. The two
@@ -121,6 +141,11 @@ namespace stampver
         // on Unix it is just '\0' and '/'. '\0' is invalid on every platform.
         private static readonly char[] InvalidPatternChars =
             Path.GetInvalidFileNameChars().Where(c => c is not ('*' or '?')).ToArray();
+
+        // Characters that can never appear in a valid path. This is a much smaller
+        // set than InvalidPatternChars — notably it excludes '\', '/' and ':', which
+        // are essential to real directory paths such as "C:\MyRepo".
+        private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
 
         #region Private Helper Methods
         private void SetVersionNumberPart(string versionPart)

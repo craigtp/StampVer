@@ -285,6 +285,23 @@ namespace stampver.Tests
             AssertContains(fakeIOWrapper.StdOutputLines, "3.5.8 (1 occurrence in 1 file)");
         }
 
+        [Test]
+        public void CallingStampverAgainstCsproj_WithDirFlag_StillProcessesViaDefaultPatterns()
+        {
+            // --dir composes with the dual-default scan: with no positional pattern, the
+            // csproj fixture is still picked up via the "*.csproj" default, and the
+            // starting directory is forwarded to enumeration.
+            var fakeIOWrapper = NewCsprojFakeIO();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir", "somedir" });
+
+            var exitCode = sut.Run();
+
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "2.4.7 (4 occurrences in 1 file)");
+            AssertContains(fakeIOWrapper.StdOutputLines, "3.5.8 (1 occurrence in 1 file)");
+            Assert.That(fakeIOWrapper.EnumeratedDirectories, Has.Member("somedir"));
+        }
+
         #endregion
     }
 }

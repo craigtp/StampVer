@@ -5,7 +5,8 @@ namespace stampver
 {
     internal interface IIOWrapper
     {
-        IEnumerable<string> EnumerateFiles(string fileToSearch);
+        IEnumerable<string> EnumerateFiles(string startDirectory, string fileToSearch);
+        bool DirectoryExists(string directory);
         string[] ReadAllLinesFromFile(string file);
         void WriteFileLinesToFile(IEnumerable<string> fileLines, string file);
         void WriteToStdOut(string output);

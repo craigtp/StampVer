@@ -7,9 +7,21 @@ namespace stampver
 {
     internal sealed class IoWrapper : IIOWrapper
     {
-        public IEnumerable<string> EnumerateFiles(string fileToSearch)
+        public IEnumerable<string> EnumerateFiles(string startDirectory, string fileToSearch)
         {
-            return Directory.EnumerateFiles(Directory.GetCurrentDirectory(), fileToSearch, SearchOption.AllDirectories);
+            // An empty start directory means "search from the current working directory",
+            // preserving the original behaviour for callers that don't pass --dir.
+            var searchRoot = string.IsNullOrEmpty(startDirectory)
+                ? Directory.GetCurrentDirectory()
+                : startDirectory;
+            return Directory.EnumerateFiles(searchRoot, fileToSearch, SearchOption.AllDirectories);
+        }
+
+        public bool DirectoryExists(string directory)
+        {
+            // An empty directory denotes the current working directory, which always
+            // exists — so only a non-empty path needs a real filesystem check.
+            return string.IsNullOrEmpty(directory) || Directory.Exists(directory);
         }
 
         public string[] ReadAllLinesFromFile(string file)
