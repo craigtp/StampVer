@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Authors>Craig Phillips</Authors>
     <Description>Small command-line tool to update AssemblyVersion attributes in .NET projects.</Description>
-    <AssemblyVersion>1.8.0</AssemblyVersion>
+    <AssemblyVersion>1.9.0</AssemblyVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
