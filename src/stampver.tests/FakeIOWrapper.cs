@@ -11,6 +11,15 @@ namespace stampver.Tests
         public List<string> StdOutputLines { get; set; }
         public List<string> StdErrorLines { get; set; }
 
+        // Captures the start directory passed to each EnumerateFiles call so tests
+        // can assert that --dir (or the current-directory default of "") is forwarded.
+        public List<string> EnumeratedDirectories { get; } = new();
+
+        // Controls what DirectoryExists returns for a non-empty directory. Defaults to
+        // true so existing tests (which never set --dir) are unaffected; flip to false
+        // to exercise the "starting directory not found" usage-error path.
+        public bool StartDirectoryExists { get; set; } = true;
+
         // When set, EnumerateFiles throws this exception instead of returning
         // a file list. Lets tests exercise the unhandled-exception path in
         // Program.RunWithIoWrapper without touching the real filesystem.
@@ -49,8 +58,11 @@ namespace stampver.Tests
             _customFilesPattern = filesPattern;
         }
 
-        public IEnumerable<string> EnumerateFiles(string fileToSearch)
+        public IEnumerable<string> EnumerateFiles(string startDirectory, string fileToSearch)
         {
+            // Record the directory for assertion, but keep dispatching on the pattern only
+            // so every existing fixture behaves exactly as before regardless of directory.
+            EnumeratedDirectories.Add(startDirectory);
             if (ExceptionToThrowOnEnumerate != null)
             {
                 throw ExceptionToThrowOnEnumerate;
@@ -65,6 +77,14 @@ namespace stampver.Tests
             return fileToSearch == "AssemblyInfo.cs"
                 ? new List<string> { "File1", "File2", "File3" }
                 : Array.Empty<string>();
+        }
+
+        public bool DirectoryExists(string directory)
+        {
+            // Mirror the real wrapper's contract: an empty directory denotes the current
+            // working directory and always "exists"; otherwise defer to the test-controlled
+            // StartDirectoryExists flag.
+            return string.IsNullOrEmpty(directory) || StartDirectoryExists;
         }
 
         public string[] ReadAllLinesFromFile(string file)

@@ -1352,6 +1352,152 @@ namespace stampver.Tests
         }
         #endregion
 
+        #region Start directory (--dir) tests
+        [Test]
+        public void CallingStampverWithDirFlag_ForwardsDirectoryToEnumerateAndProcessesFiles()
+        {
+            // --dir sets the starting directory. The fake dispatches on pattern only, so
+            // the default three-file fixture is still processed; the point of this test is
+            // that the directory we asked for is the one forwarded to EnumerateFiles.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir", "somedir" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.EnumeratedDirectories, Has.Member("somedir"));
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.3.1\")]");
+        }
+
+        [Test]
+        public void CallingStampverWithDirectoryAliasFlag_ForwardsDirectoryToEnumerate()
+        {
+            // The long-form --directory alias is equivalent to --dir.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--directory", "somedir" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            Assert.That(fakeIOWrapper.EnumeratedDirectories, Has.Member("somedir"));
+        }
+
+        [Test]
+        public void CallingStampverWithDirFlagAndExplicitPattern_UsesBothDirectoryAndPattern()
+        {
+            // --dir composes with an explicit positional pattern: the pattern still
+            // suppresses the AssemblyInfo.cs/*.csproj defaults (so EnumerateFiles is
+            // called exactly once, for *.txt), and the directory is forwarded with it.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper(
+                files: new[] { "Notes.txt" },
+                fileContents: new Dictionary<string, string>
+                {
+                    { "Notes.txt", "[assembly: AssemblyVersion(\"1.2.3\")]\n" },
+                },
+                filesPattern: "*.txt");
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir", "somedir", "*.txt" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            AssertContains(fakeIOWrapper.StdOutputLines, "1.2.4 (1 occurrence in 1 file)");
+            AssertContains(fakeIOWrapper.FileLinesOutput, "[assembly: AssemblyVersion(\"1.2.4\")]");
+            // Explicit pattern suppresses the dual defaults, so only one sweep happened.
+            Assert.That(fakeIOWrapper.EnumeratedDirectories, Is.EqualTo(new[] { "somedir" }));
+        }
+
+        [Test]
+        public void CallingStampverWithDirFlagContainingInvalidCharacter_OutputsErrorText()
+        {
+            // A NUL is invalid in any path, so this is rejected at validation time
+            // (no filesystem access), mirroring the file-pattern validation.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir", "bad\0dir" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "Invalid directory specified");
+        }
+
+        [Test]
+        public void CallingStampverWithDirFlagForNonExistentDirectory_OutputsErrorText()
+        {
+            // When the directory passes the character check but does not exist, Stampver
+            // reports a clean usage error rather than letting enumeration throw into the
+            // top-level catch-all.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper { StartDirectoryExists = false };
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir", "nonexistent-dir" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.StdOutputLines.Count, Is.EqualTo(0));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "error:");
+            AssertContains(fakeIOWrapper.StdErrorLines, "starting directory not found");
+        }
+
+        [Test]
+        public void CallingStampverWithDirFlagButNoValue_OutputsErrorText()
+        {
+            // --dir takes a required value; omitting it is a usage error from the parser.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch", "--dir" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.UsageError));
+            Assert.That(fakeIOWrapper.FileLinesOutput.Count, Is.EqualTo(0));
+            AssertContains(fakeIOWrapper.StdErrorLines, "Missing required value for option '--dir'.");
+        }
+
+        [Test]
+        public void CallingStampverWithoutDirFlag_EnumeratesCurrentDirectory()
+        {
+            // Backward-compatibility pin: with no --dir, every enumeration uses the
+            // empty-string sentinel that IoWrapper resolves to the current directory.
+
+            // Arrange
+            var fakeIOWrapper = new FakeIOWrapper();
+            var sut = new Stampver(fakeIOWrapper, new[] { "-i", "patch" });
+
+            // Act
+            var exitCode = sut.Run();
+
+            // Assert
+            Assert.That(exitCode, Is.EqualTo(ExitCodes.Success));
+            Assert.That(fakeIOWrapper.EnumeratedDirectories.Count, Is.GreaterThan(0));
+            Assert.That(fakeIOWrapper.EnumeratedDirectories, Has.All.EqualTo(string.Empty));
+        }
+        #endregion
+
         [TestCase("Patcher")]
         [TestCase("xmajor")]
         [TestCase("majorette")]

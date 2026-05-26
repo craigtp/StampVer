@@ -29,6 +29,7 @@ A small command-line utility for updating .NET assembly version metadata in bulk
 - **Honours conditional element attributes** such as `<Version Condition="...">1.0.0</Version>`.
 - **Clamps every part to `[0, 65535]`** so generated versions remain valid .NET assembly metadata.
 - **Dry-run mode** previews the changes without writing to disk.
+- **Custom starting directory** via `--dir` so you can stamp another repository without `cd`-ing into it.
 - **Custom file patterns** for projects that don't fit either default.
 - **Self-contained single-file binary** when published - no .NET runtime required on the target machine.
 - **Zero external dependencies** at runtime.
@@ -52,7 +53,7 @@ See [Building from source](#building-from-source) below.
 ## Usage
 
 ```
-stampver <command> <version-part-or-number> [filepattern] [options]
+stampver <command> <version-part-or-number> [--dir <path>] [filepattern] [options]
 ```
 
 ### Commands
@@ -80,11 +81,22 @@ The `-i`, `-d`, and `-e` commands are mutually exclusive.
 
 | Flag | Meaning |
 | --- | --- |
+| `--dir <path>` (or `--directory <path>`) | Directory to start the recursive search from. Defaults to the current working directory. |
 | `--quiet` | Suppress all console output. |
 | `--verbose` | Log every file inspected and every change made. |
 | `--dryrun` | Show what *would* change without modifying any files. Implies `--verbose`. |
 
 `--quiet` and `--verbose` are mutually exclusive.
+
+### Starting directory
+
+By default StampVer walks the current working directory. Pass `--dir <path>` (alias `--directory`) to start the recursive walk from somewhere else, so you can stamp another repository without `cd`-ing into it:
+
+```bash
+stampver -i MINOR --dir "C:\MySourceCode\MyRepo"
+```
+
+The search is always recursive through every subdirectory of the starting directory. If the directory doesn't exist, StampVer reports a usage error and makes no changes. `--dir` composes with the file pattern below.
 
 ### File pattern
 
@@ -129,12 +141,19 @@ Bump the patch number across a non-default file pattern:
 stampver -i PATCH "Version.cs"
 ```
 
+Stamp a different repository (recursively) without changing directory, optionally narrowing to a pattern:
+
+```bash
+stampver -i MINOR --dir "C:\MySourceCode\MyRepo"
+stampver -i MINOR --dir "C:\MySourceCode\MyRepo" "*.txt"
+```
+
 ## How it works
 
 The pipeline is intentionally small:
 
 1. **Parse arguments** into a `VersionArgs` aggregate; reject mutually-exclusive combinations early.
-2. **Enumerate files** matching the pattern under the current working directory. When no pattern is given, the `AssemblyInfo.cs` and `*.csproj` defaults are scanned in turn.
+2. **Enumerate files** matching the pattern under the starting directory (the current working directory unless `--dir` is given), recursing through all subdirectories. When no pattern is given, the `AssemblyInfo.cs` and `*.csproj` defaults are scanned in turn.
 3. **Pick a file format** per file based on extension - the MSBuild XML matcher for `.csproj`, the C# attribute matcher otherwise.
 4. **Per line**, run the format's compiled regex; skip the format's comment marker (`//` or `<!--`).
 5. **Transform the version** through `AssemblyVersion`, which preserves non-numeric tokens (e.g. `*`) and clamps numeric parts to `[0, UInt16.MaxValue]`.
